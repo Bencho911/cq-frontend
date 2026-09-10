@@ -1,0 +1,236 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────────────────────────
+   Café Quindío — Design System v3 (Identidad Corporativa Real)
+   Paleta extraída de los artes corporativos oficiales:
+     • Teal   #49B4AA  (logo principal, ventanas coloniales)
+     • Dorado #E8903A  (fauna: pájaros, mariposas)
+     • Crema  #F5EDD8  (fondos cálidos, wallpapers)
+     • Nogal  #8B6914  (logo variante café, textos sobre claro)
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  /* Tipografía */
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* ── Superficies (fondo claro cálido tipo crema colonial) ── */
+  --color-cream: #F5EDD8;          /* fondo base — crema del wallpaper */
+  --color-cream-mid: #EEE4C7;      /* superficies secundarias */
+  --color-cream-deep: #E4D7BB;     /* input, chips */
+  --color-surface: #FEFAF3;        /* tarjetas sobre cream */
+  --color-ink: #1C1208;            /* texto principal (espresso profundo) */
+
+  /* ── Hero / fondos oscuros para pantallas de impacto ── */
+  --color-espresso: #0F1F1E;       /* oscuro con tinte teal */
+  --color-espresso-mid: #1A2E2C;   /* superficies oscuras */
+  --color-espresso-light: #243B38; /* tarjetas oscuras */
+
+  /* ── Neutros cálidos ── */
+  --color-line: #D8CBAD;
+  --color-line-dark: #2E3D3A;      /* bordes en fondos oscuros */
+  --color-muted: #7A6A4A;
+  --color-muted-soft: #A09070;
+  --color-muted-strong: #5A4A2A;
+
+  /* ── Brand principal: TEAL de Café Quindío ── */
+  --color-brand: #49B4AA;          /* teal del logo */
+  --color-brand-strong: #35887F;   /* hover / pressed */
+  --color-brand-deep: #266059;     /* activos muy marcados */
+  --color-brand-soft: #D6F0ED;     /* chips, badges suaves */
+  --color-brand-dark: #1A3532;     /* teal sobre oscuro (secciones hero) */
+
+  /* ── Acento: DORADO de la fauna (pájaros, mariposas) ── */
+  --color-accent: #E8903A;         /* dorado naranja protagonista */
+  --color-accent-bright: #F5A552;  /* hover / énfasis */
+  --color-accent-soft: #FAE0BC;    /* fondos suaves */
+  --color-accent-deep: #B86D1E;    /* texto sobre claro */
+  --color-accent-glow: rgba(232, 144, 58, 0.28);
+
+  /* ── Nogal (variante marrón del logo) ── */
+  --color-nogal: #8B6914;
+  --color-nogal-soft: #F2E8CC;
+
+  /* ── Semánticos ── */
+  --color-success: #2B7A55;
+  --color-success-soft: #D5EDE3;
+  --color-danger: #B83025;
+  --color-danger-soft: #FDE8E5;
+  --color-warning: #C9831A;
+  --color-warning-soft: #FEF0D8;
+  --color-star: #E8903A;           /* misma que accent para coherencia */
+
+  /* ── Radios ── */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+
+  /* ── Sombras (tinte teal oscuro, no negro puro) ── */
+  --shadow-xs:    0 1px  4px rgba(10, 30, 28, 0.06);
+  --shadow-soft:  0 3px 14px rgba(10, 30, 28, 0.08);
+  --shadow-card:  0 6px 26px rgba(10, 30, 28, 0.10);
+  --shadow-lift:  0 18px 42px rgba(10, 30, 28, 0.18);
+  --shadow-nav:   0 -4px 24px rgba(10, 30, 28, 0.12);
+  --shadow-brand: 0 6px 24px rgba(73, 180, 170, 0.30);
+  --shadow-accent: 0 6px 24px rgba(232, 144, 58, 0.30);
+
+  /* ── Easing ── */
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-index ── */
+  --z-base:     0;
+  --z-dropdown: 10;
+  --z-sticky:   20;
+  --z-overlay:  30;
+  --z-modal:    50;
+  --z-toast:    60;
+  --z-nav:      40;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ── Scrollbar oculta ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Gradiente hero oscuro con tinte teal ── */
+.gradient-hero {
+  background: linear-gradient(160deg, #0F1F1E 0%, #1A2E2C 50%, #243B38 100%);
+}
+
+/* ── Gradiente teal de marca ── */
+.gradient-brand {
+  background: linear-gradient(135deg, var(--color-brand-deep) 0%, var(--color-brand) 60%, #6DD4CC 100%);
+}
+
+/* ── Gradiente dorado fauna ── */
+.gradient-accent {
+  background: linear-gradient(135deg, var(--color-accent-deep) 0%, var(--color-accent) 60%, var(--color-accent-bright) 100%);
+}
+
+/* ── Fondo crema cálida con textura de palmas (wallpaper) ── */
+.bg-palmas {
+  background-image: url('/Artes corporativos/Fondos/fondos de color-Palmas.png');
+  background-size: cover;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+}
+
+/* ── Tarjeta glass sobre hero oscuro ── */
+.glass-dark {
+  background: rgba(26, 46, 44, 0.65);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(73, 180, 170, 0.20);
+}
+
+/* ── Tarjeta glass sobre crema ── */
+.glass-cream {
+  background: rgba(254, 250, 243, 0.80);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  border: 1px solid rgba(210, 190, 150, 0.40);
+}
+
+/* ── Línea decorativa teal ── */
+.brand-underline {
+  position: relative;
+}
+.brand-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--color-brand);
+  border-radius: 999px;
+}
+
+/* ── Glow para badge de lealtad / puntos ── */
+.badge-glow {
+  box-shadow: 0 0 12px var(--color-accent-glow), 0 0 4px var(--color-accent-glow);
+}
+
+/* ── Shimmer para skeleton ── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-cream-deep) 25%,
+    var(--color-cream-mid) 50%,
+    var(--color-cream-deep) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Pulso sutil para badge del carrito ── */
+@keyframes cart-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.1); }
+}
+.cart-pulse {
+  animation: cart-pulse 2s ease-in-out infinite;
+}
+
+/* ── Patrón de grano (textura colonial sutil) ── */
+.grain-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ── Reducir movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
