@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Ticket } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 
 // MOCK: el backend no expone cupones/descuentos aún.
 const vouchers = [

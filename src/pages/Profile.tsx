@@ -34,7 +34,7 @@ const stagger = {
 };
 const fadeUp = {
   initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.23, 1, 0.32, 1] } },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" as any } },
 };
 
 interface MenuGroup {
@@ -168,7 +168,7 @@ const Profile = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ delay: 0.15, duration: 0.4, ease: "easeOut" as any }}
           className="overflow-hidden rounded-2xl border bg-surface"
           style={{
             borderColor: 'var(--color-brand-soft)',
@@ -203,7 +203,7 @@ const Profile = () => {
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${loyaltyPct}%` }}
-                transition={{ delay: 0.5, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+                transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" as any }}
                 className="h-full rounded-full"
                 style={{ background: 'var(--color-brand)' }}
               />
@@ -223,7 +223,7 @@ const Profile = () => {
             key={group.title}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + gi * 0.07, duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ delay: 0.2 + gi * 0.07, duration: 0.35, ease: "easeOut" as any }}
           >
             <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted">
               {group.title}

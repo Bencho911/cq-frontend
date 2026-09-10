@@ -40,8 +40,8 @@ import Vouchers from './pages/Vouchers';
 
 const pageVariants: Variants = {
   initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.28, ease: [0.23, 1, 0.32, 1] } },
-  exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: [0.23, 1, 0.32, 1] } },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.28, ease: "easeOut" as any } },
+  exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeOut" as any } },
 };
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (

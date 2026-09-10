@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Star, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 
 const RatingReview = () => {
   const navigate = useNavigate();

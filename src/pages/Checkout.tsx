@@ -7,7 +7,6 @@ import { orderService } from '../lib/orderService';
 import { formatCOP } from '../lib/format';
 import { USE_MOCKS } from '../lib/env';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/EmptyState';
 import TimePickerModal from '../components/ui/TimePickerModal';
 

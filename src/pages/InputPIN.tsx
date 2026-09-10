@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 
 const circleVariant = {
   hidden: { opacity: 0, scale: 0.5 },

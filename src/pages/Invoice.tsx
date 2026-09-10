@@ -10,8 +10,8 @@ import {
   Share2,
   Store,
 } from 'lucide-react';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 import { formatCOP } from '../lib/format';
 
 // Datos mock de fallback si no se recibe el pedido por state
@@ -37,7 +37,7 @@ const stagger = {
 };
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.23, 1, 0.32, 1] } },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.38, ease: "easeOut" as any } },
 };
 
 const Invoice = () => {

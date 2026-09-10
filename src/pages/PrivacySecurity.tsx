@@ -18,7 +18,7 @@ const stagger = {
 
 const fadeUp = {
   initial: { opacity: 0, y: 15 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as any } },
 };
 
 const PrivacySecurity = () => {

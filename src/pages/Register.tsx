@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import OTPModal from '../components/ui/OTPModal';
 
 const staggerContainer = {

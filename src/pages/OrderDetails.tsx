@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Download } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { orderService } from '../lib/orderService';
 import { useCartTotals } from '../lib/cart';
 import { formatCOP } from '../lib/format';

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Banknote, CreditCard, Store } from 'lucide-react';
 import { useCart } from '../lib/cart';
-import { Badge } from '../components/ui/Badge';
 
 const METHODS = [
   {

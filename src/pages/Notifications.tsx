@@ -12,7 +12,6 @@ import {
   Info,
   Star,
 } from 'lucide-react';
-import { Badge } from '../components/ui/Badge';
 
 // MOCK: datos de notificaciones para la demo de gerencia
 const MOCK_NOTIFICATIONS = [
@@ -136,7 +135,7 @@ const Notifications = () => {
               key={notif.id}
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05, duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: i * 0.05, duration: 0.3, ease: "easeOut" as any }}
               onClick={() => markRead(notif.id)}
               className={`flex w-full items-start gap-3 px-5 py-4 text-left transition-colors ${
                 notif.read ? 'bg-cream' : 'bg-surface'
