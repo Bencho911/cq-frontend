@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Transition } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Coffee, MapPin, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bell, Coffee, MapPin, Search, ShoppingBag, Sparkles } from 'lucide-react';
 import { productService } from '../lib/productService';
 import type { Category, Product } from '../lib/types';
 import { useCart, useCartTotals } from '../lib/cart';
@@ -12,24 +12,29 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import ProductDetailSheet from '../components/ui/ProductDetailSheet';
 
+// Cada banner puede apuntar a una ruta distinta (p. ej. una categoría
+// específica del menú). Ajusta `href` según tus rutas reales.
 const BANNERS = [
   {
     src: '/Artes corporativos/Composiciones/composiciones- 1.png',
     label: 'Sabor del Quindío',
     sub: 'El café del corazón de Colombia',
     bg: '#D6F0ED',
+    href: '/menu',
   },
   {
     src: '/Artes corporativos/Composiciones/composiciones- 2.png',
     label: '¡Nuevas bebidas!',
     sub: 'Descúbrelas esta temporada',
     bg: '#FAE0BC',
+    href: '/menu',
   },
   {
     src: '/Artes corporativos/Composiciones/composiciones- 4.png',
     label: 'Tradición colombiana',
     sub: 'Pide ya y recoge en minutos',
     bg: '#E8D5F0',
+    href: '/menu',
   },
 ];
 
@@ -37,9 +42,12 @@ const stagger = {
   initial: {},
   animate: { transition: { staggerChildren: 0.07 } },
 };
+
+// Transición tipada explícitamente en vez de castear `ease` con `as any`.
+const EASE_OUT_TRANSITION: Transition = { duration: 0.4, ease: 'easeOut' };
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as any } },
+  animate: { opacity: 1, y: 0, transition: EASE_OUT_TRANSITION },
 };
 
 const Home = () => {
@@ -102,12 +110,21 @@ const Home = () => {
     return list;
   }, [products, activeCategory, query]);
 
-  const greeting = (() => {
-    const h = new Date().getHours();
+  // `now` se refresca cada minuto para que el saludo cambie solo si la
+  // sesión queda abierta cruzando de mañana a tarde/noche, sin depender
+  // de que algo más dispare un re-render.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const greeting = useMemo(() => {
+    const h = now.getHours();
     if (h < 12) return 'Buenos días';
     if (h < 18) return 'Buenas tardes';
     return 'Buenas noches';
-  })();
+  }, [now]);
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col pb-28">
@@ -144,13 +161,18 @@ const Home = () => {
 
         {/* Buscador */}
         <div className="relative">
+          <Search
+            size={16}
+            className="pointer-events-none absolute inset-y-0 left-4 my-auto text-muted-soft"
+            aria-hidden
+          />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar bebidas, pasteles y más…"
             aria-label="Buscar productos"
-            className="h-11 w-full rounded-full border border-line bg-surface pl-5 pr-11 text-[14px] font-medium text-ink outline-none placeholder:text-muted-soft transition-colors focus:border-brand"
+            className="h-11 w-full rounded-full border border-line bg-surface pl-11 pr-11 text-[14px] font-medium text-ink outline-none placeholder:text-muted-soft transition-colors focus:border-brand"
           />
           <Coffee size={17} className="pointer-events-none absolute inset-y-0 right-4 my-auto text-brand" aria-hidden />
         </div>
@@ -168,15 +190,22 @@ const Home = () => {
           }}
         >
           {BANNERS.map((banner, idx) => (
-            <div
+            <button
               key={idx}
-              className="relative h-[160px] w-full shrink-0 snap-center overflow-hidden"
+              type="button"
+              onClick={() => navigate(banner.href)}
+              className="relative h-[160px] w-full shrink-0 snap-center overflow-hidden text-left"
               style={{ backgroundColor: banner.bg }}
             >
-              {/* Texto superpuesto */}
-              <div className="absolute left-0 top-0 z-10 flex h-full w-[55%] flex-col justify-center px-5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-brand">{banner.sub}</p>
-                <h2 className="mt-1 font-display text-[19px] font-semibold leading-tight text-ink">{banner.label}</h2>
+              {/* Texto superpuesto + CTA */}
+              <div className="absolute left-0 top-0 z-10 flex h-full w-[55%] flex-col justify-center gap-3 px-5">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-brand">{banner.sub}</p>
+                  <h2 className="mt-1 font-display text-[19px] font-semibold leading-tight text-ink">{banner.label}</h2>
+                </div>
+                <span className="inline-flex w-fit items-center rounded-full bg-brand px-3.5 py-1.5 text-[12px] font-bold text-cream shadow-soft">
+                  Pedir ahora
+                </span>
               </div>
               {/* Imagen de composición corporativa */}
               <img
@@ -185,7 +214,7 @@ const Home = () => {
                 className="absolute right-0 top-0 h-full w-[55%] object-contain object-right"
                 loading={idx === 0 ? 'eager' : 'lazy'}
               />
-            </div>
+            </button>
           ))}
         </div>
         <div className="mt-2.5 flex justify-center gap-1.5">
@@ -207,33 +236,50 @@ const Home = () => {
             <h2 className="text-[14px] font-bold uppercase tracking-widest text-accent-deep">Hoy en especial</h2>
           </div>
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
-            {featuredProducts.map((p) => (
-              <motion.button
-                key={p.cod_prod}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setSelectedProduct(p)}
-                className="shrink-0 overflow-hidden rounded-2xl bg-surface"
-                style={{ width: 160, boxShadow: 'var(--shadow-card)' }}
-              >
-                <div className="relative h-[100px] w-full bg-cream-deep">
-                  {p.url_imagen && (
-                    <img src={p.url_imagen} alt={p.nom_prod} className="h-full w-full object-contain p-2" />
-                  )}
-                  {p.descuento && (
-                    <div
-                      className="absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-cream"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      -{p.descuento}%
+            {featuredProducts.map((p) => {
+              // Asume que `precio_unitario` ya es el precio CON descuento
+              // aplicado, y reconstruye el original para el tachado. Si tu
+              // backend guarda el precio original por separado, úsalo
+              // directamente en vez de este cálculo.
+              const originalPrice = p.descuento
+                ? Math.round(p.precio_unitario / (1 - p.descuento / 100))
+                : null;
+
+              return (
+                <motion.button
+                  key={p.cod_prod}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSelectedProduct(p)}
+                  className="shrink-0 overflow-hidden rounded-2xl bg-surface"
+                  style={{ width: 160, boxShadow: 'var(--shadow-card)' }}
+                >
+                  <div className="relative h-[100px] w-full bg-cream-deep">
+                    {p.url_imagen && (
+                      <img src={p.url_imagen} alt={p.nom_prod} className="h-full w-full object-contain p-2" />
+                    )}
+                    {p.descuento && (
+                      <div
+                        className="absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-cream"
+                        style={{ background: 'var(--color-accent)' }}
+                      >
+                        -{p.descuento}%
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <p className="truncate text-[13px] font-bold text-ink">{p.nom_prod}</p>
+                    <div className="mt-0.5 flex items-baseline gap-1.5">
+                      {originalPrice !== null && (
+                        <span className="text-[11px] font-medium text-muted-soft line-through">
+                          {formatCOP(originalPrice)}
+                        </span>
+                      )}
+                      <p className="text-[13px] font-bold text-accent">{formatCOP(p.precio_unitario)}</p>
                     </div>
-                  )}
-                </div>
-                <div className="p-2.5">
-                  <p className="truncate text-[13px] font-bold text-ink">{p.nom_prod}</p>
-                  <p className="mt-0.5 text-[13px] font-bold text-accent">{formatCOP(p.precio_unitario)}</p>
-                </div>
-              </motion.button>
-            ))}
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -243,11 +289,10 @@ const Home = () => {
         <button
           onClick={() => setActiveCategory('all')}
           aria-pressed={activeCategory === 'all'}
-          className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
-            activeCategory === 'all'
+          className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${activeCategory === 'all'
               ? 'bg-brand text-cream shadow-soft'
               : 'bg-cream-deep text-muted-strong hover:bg-line'
-          }`}
+            }`}
         >
           Todos
         </button>
@@ -256,11 +301,10 @@ const Home = () => {
             key={cat.cod_cat}
             onClick={() => setActiveCategory(cat.cod_cat)}
             aria-pressed={activeCategory === cat.cod_cat}
-            className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
-              activeCategory === cat.cod_cat
+            className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${activeCategory === cat.cod_cat
                 ? 'bg-brand text-cream shadow-soft'
                 : 'bg-cream-deep text-muted-strong hover:bg-line'
-            }`}
+              }`}
           >
             {cat.nom_cat}
           </button>
