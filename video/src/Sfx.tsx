@@ -40,8 +40,6 @@ const VOICE = [{ file: 'voz.mp3', at: 0 }];
 
 const DUCK = 0.55;
 const VOICE_VOLUME = 0.9;
-/** Ambiente de cafetería (loop de 10 s repetido a 30 s), muy por debajo de la voz. */
-const AMBIENCE_VOLUME = 0.55;
 
 /**
  * Pista de efectos. Solo programa los sonidos listados en manifest.json,
@@ -64,7 +62,6 @@ export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts })
 
 export const VoiceTrack: React.FC = () => (
   <>
-    <Audio src={staticFile('sfx/ambiente.wav')} volume={AMBIENCE_VOLUME} />
     {VOICE.map((v) => (
       <Sequence key={v.file} from={v.at} layout="none">
         <Audio src={staticFile(`vo/${v.file}`)} volume={VOICE_VOLUME} />

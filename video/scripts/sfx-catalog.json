@@ -44,11 +44,5 @@
     "text": "Points counter counting up in a mobile game: fast series of soft bright wooden marimba ticks rising in pitch, starting quick and slowing slightly at the end, light and cheerful, clean UI sound, dry, no reverb tail",
     "durationSeconds": 1.0,
     "promptInfluence": 0.3
-  },
-  "ambiente": {
-    "text": "Cozy Colombian coffee shop ambience, soft distant murmur of people, gentle clinking of ceramic cups and spoons, occasional quiet espresso machine hiss, warm and calm, no music, no clear voices, steady seamless loop",
-    "durationSeconds": 10,
-    "promptInfluence": 0.45,
-    "loop": true
   }
 }
