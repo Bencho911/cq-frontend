@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dirección 2 · Fachadas de Salento</title>
+<style>
+/*
+  DIRECCIÓN 2 — FACHADAS DE SALENTO
+  Las calles del Quindío son bloques de color plano: puerta mostaza, baranda
+  teal, zócalo rojo. Aquí cada categoría es una puerta pintada y la pantalla
+  se lee como una calle. Las tintas son las mismas de las ilustraciones
+  corporativas, usadas a pleno y con texto en azul tinta (no blanco), que es
+  lo que les da contraste (4.5–6.6:1).
+  Tipografía: Bricolage Grotesque para titulares (tiene el aire de letrero
+  pintado a mano sin ser caricatura) + Neutra Text para todo lo demás.
+  Sin sombras, sin tarjetas: bloques planos, como pintura sobre cal.
+*/
+@font-face { font-family: Brico; src: url(fonts/BricolageGrotesque.woff2) format('woff2'); font-weight: 200 800; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Book.otf); font-weight: 400; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Demi.otf); font-weight: 600; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Bold.otf); font-weight: 700; }
+@font-face { font-family: NeutraTF; src: url(fonts/NeutraTextTF-Demi.otf); font-weight: 600; }
+
+:root {
+  --cal: #FFFFFF;
+  --tinta: #18303C;      /* azul tinta de las ilustraciones */
+  --tinta-2: #4E5F68;
+  --mostaza: #E6A90E;
+  --rosa: #E66C92;
+  --teal: #62AAA9;
+  --rojo: #C2391F;       /* blanco encima: 5.4:1 */
+  --verde: #1D6B64;      /* blanco encima: 6.3:1 */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #D8D6D2; font-family: Neutra, system-ui, sans-serif; color: var(--tinta);
+  display: flex; gap: 48px; justify-content: center; align-items: flex-start; padding: 40px; flex-wrap: wrap; }
+.phone { width: 390px; height: 844px; background: var(--cal); position: relative; overflow: hidden;
+  border-radius: 44px; box-shadow: 0 30px 60px rgba(24,48,60,.2); }
+.status { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px;
+  font: 600 16px/1 NeutraTF, Neutra; position: relative; z-index: 3; }
+.sb-icons { display: flex; gap: 6px; align-items: center; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:active { transform: scale(0.97); transition: transform 120ms var(--ease-out); }
+.num { font-family: NeutraTF, Neutra; font-weight: 600; font-variant-numeric: tabular-nums; }
+.brico { font-family: Brico, Neutra, sans-serif; }
+
+.bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px 0; }
+.bar img { height: 24px; }
+.store { height: 40px; padding: 0 12px 0 10px; border-radius: 20px; background: #EEF3F3;
+  display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; }
+
+h1.hello { font-family: Brico; font-weight: 800; font-size: 36px; line-height: .98; letter-spacing: -0.035em;
+  padding: 22px 20px 0; font-variation-settings: "opsz" 96; }
+h1.hello span { display: block; color: var(--tinta-2); font-weight: 700; }
+
+/* ── La puerta mostaza: lo de siempre ── */
+.door { margin: 22px 0 0; background: var(--mostaza); padding: 20px 20px 22px; position: relative; overflow: hidden;
+  display: grid; grid-template-columns: 1fr 124px; gap: 12px; }
+.door h2 { font-family: Brico; font-weight: 800; font-size: 26px; letter-spacing: -0.02em; line-height: 1; }
+.door p { font-size: 15px; margin-top: 6px; line-height: 1.35; }
+.door .go { margin-top: 16px; height: 48px; padding: 0 18px; background: var(--tinta); color: #fff; border-radius: 6px;
+  font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; }
+.door .arch { align-self: end; height: 132px; background: #fff; border-radius: 56px 56px 0 0;
+  margin-bottom: -22px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+.door .arch img { width: 66px; } .door .arch img + img { margin-left: -22px; }
+/* Zócalo: la franja inferior de las fachadas */
+.zocalo { height: 10px; background: repeating-linear-gradient(90deg, var(--rojo) 0 28px, var(--tinta) 28px 32px); }
+
+/* ── Tres puertas: categorías ── */
+.doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 20px 20px 0; }
+.d { height: 164px; border-radius: 52px 52px 6px 6px; position: relative; overflow: hidden; display: flex;
+  flex-direction: column; justify-content: flex-end; padding: 0 12px 12px; text-align: left; }
+.d img { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); height: 72px; }
+.d b { font-family: Brico; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; line-height: 1; position: relative; }
+.d small { font-size: 13px; line-height: 1.2; position: relative; margin-top: 4px; }
+.d.teal { background: var(--teal); } .d.rosa { background: var(--rosa); } .d.verde { background: var(--verde); color: #fff; }
+
+/* ── Lista tipográfica ── */
+.list { padding: 24px 20px 0; }
+.list h3 { font-family: Brico; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+.row { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; padding: 12px 0;
+  border-bottom: 1px solid #E6E9EA; }
+.row .pic { width: 52px; height: 52px; border-radius: 26px; background: #F1EDE4; display: grid; place-items: center; overflow: hidden; }
+.row .pic img { width: 40px; }
+.row b { font-size: 17px; font-weight: 700; display: block; }
+.row small { font-size: 14px; color: var(--tinta-2); }
+.row .num { font-size: 17px; }
+
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: var(--tinta); color: #9FB0B8;
+  display: flex; justify-content: space-around; padding-top: 10px; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; width: 72px; }
+.tab.on { color: #fff; font-weight: 700; }
+.tab.on::after { content: ""; width: 18px; height: 3px; background: var(--mostaza); border-radius: 2px; margin-top: 2px; }
+
+/* ── Pantalla 2: pedido listo ── */
+.ready { background: var(--verde); color: #fff; }
+.ready .status { color: #fff; }
+.ready .scene { position: absolute; left: -10px; right: -10px; bottom: 0; height: 440px; }
+.ready .scene img { position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%); width: 250px; }
+.ready .scene .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; background: var(--mostaza); }
+.ready .scene .ground::before { content: ""; position: absolute; top: -10px; left: 0; right: 0; height: 10px;
+  background: repeating-linear-gradient(90deg, var(--rojo) 0 28px, var(--tinta) 28px 32px); }
+.ready .txt { padding: 26px 24px 0; position: relative; }
+.ready .tag { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 16px;
+  background: rgba(255,255,255,.14); font-size: 14px; font-weight: 600; }
+.ready .tag i { width: 8px; height: 8px; border-radius: 4px; background: var(--mostaza); }
+.ready h1 { font-family: Brico; font-weight: 800; font-size: 56px; line-height: .92; letter-spacing: -0.045em; margin-top: 18px;
+  font-variation-settings: "opsz" 96; }
+.ready p { font-size: 17px; line-height: 1.4; margin-top: 14px; color: #D7ECE9; max-width: 300px; }
+.ready p b { color: #fff; }
+.ready .actions { position: absolute; left: 20px; right: 20px; bottom: 34px; display: grid; gap: 10px; z-index: 2; }
+.ready .actions button { height: 54px; border-radius: 6px; font-size: 17px; font-weight: 600; }
+.ready .primary { background: var(--tinta); color: #fff; }
+.ready .ghost { color: var(--tinta); font-weight: 600; }
+.caption { width: 100%; text-align: center; font: 400 15px Neutra; color: #4E5F68; }
+.caption b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<p class="caption"><b>Dirección 2 · Fachadas de Salento.</b> Cada categoría es una puerta pintada. Color plano, sin tarjetas ni sombras: la pantalla se lee como una calle.</p>
+
+<!-- ═════════════ PANTALLA 1 · INICIO ═════════════ -->
+<div class="phone">
+  <div class="status"><span class="num">9:41</span><span class="sb-icons"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"/></svg></span></div>
+  <div class="bar">
+    <img src="img/logo-teal.png" alt="Café Quindío" style="filter:brightness(.55) saturate(1.3)">
+    <button class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Centro<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>
+  </div>
+
+  <h1 class="hello">Buenas tardes,<span>Santiago.</span></h1>
+
+  <section class="door">
+    <div>
+      <h2>¿Lo de siempre?</h2>
+      <p>Nitro Cold Brew y Caramel Latte, listos en 6 minutos.</p>
+      <button class="go">Pedir por <span class="num">$56.200</span></button>
+    </div>
+    <div class="arch"><img src="../public/nitro.svg" alt=""><img src="../public/caramel_latte.svg" alt=""></div>
+  </section>
+  <div class="zocalo"></div>
+
+  <div class="doors">
+    <button class="d teal"><img src="img/cafe-rama.png" alt=""><b>Café</b><small>Tintos, lattes y fríos</small></button>
+    <button class="d rosa"><img src="img/heliconia.png" alt="" style="filter:brightness(1.6) saturate(.7)"><b>Sin café</b><small>Chocolates y aromáticas</small></button>
+    <button class="d verde"><img src="img/palma.png" alt=""><b>Pastelería</b><small>Para acompañar</small></button>
+  </div>
+
+  <div class="list">
+    <h3>Lo más pedido hoy</h3>
+    <div class="row"><span class="pic"><img src="../public/cafeconleche.svg" alt=""></span><div><b>Café con leche</b><small>Americano con hielo y leche</small></div><span class="num">$25.000</span></div>
+    <div class="row"><span class="pic"><img src="../public/macha.svg" alt=""></span><div><b>Caffè Mocha</b><small>Espresso, moca y crema</small></div><span class="num">$29.000</span></div>
+  </div>
+
+  <nav class="tabbar">
+    <div class="tab on"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4zM6 2v2M10 2v2M14 2v2"/></svg>Menú</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/></svg>Pedidos</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Cuenta</div>
+  </nav>
+</div>
+
+<!-- ═════════════ PANTALLA 2 · PEDIDO LISTO ═════════════ -->
+<div class="phone ready">
+  <div class="status"><span class="num">9:47</span><span class="sb-icons"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"/></svg></span></div>
+  <div class="txt">
+    <span class="tag"><i></i>Pedido <span class="num">1238</span></span>
+    <h1>Tu pedido está listo.</h1>
+    <p>Recógelo en la barra de la <b>Tienda Centro</b>. Muestra este código: <b class="num">CQ-4471</b></p>
+  </div>
+  <div class="scene">
+    <img src="img/puerta-capibara.png" alt="">
+    <div class="ground"></div>
+  </div>
+  <div class="actions">
+    <button class="primary">Ya lo recogí</button>
+    <button class="ghost">Ver recibo</button>
+  </div>
+</div>
+</body>
+</html>
