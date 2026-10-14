@@ -14,6 +14,7 @@
     "remotion": "4.0.535"
   },
   "devDependencies": {
+    "@elevenlabs/elevenlabs-js": "2.72.0",
     "@remotion/eslint-config-flat": "4.0.535",
     "@types/react": "19.2.7",
     "@types/web": "0.0.166",
@@ -25,6 +26,7 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "sfx": "node scripts/generate-sfx.mjs"
   }
 }

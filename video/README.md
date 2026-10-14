@@ -35,4 +35,21 @@ En entornos sin Chrome compatible, agrega
   carrito, `/album`, pedido listo). Si la app cambia, vuelve a capturarlas.
 - `public/brand/` y `public/fonts/`: los mismos de la app. Neutra Text es
   comercial: confirmar la licencia antes de publicar el video.
-- El video no tiene audio todavía.
+
+## Efectos de sonido (ElevenLabs)
+
+Los efectos se generan una vez con ElevenLabs Text to Sound Effects
+(SDK `@elevenlabs/elevenlabs-js`) y se guardan en `public/sfx/`. El render
+no llama a ElevenLabs.
+
+```bash
+ELEVENLABS_API_KEY=... npm run sfx            # genera los que faltan
+ELEVENLABS_API_KEY=... npm run sfx -- tap pop # regenera esos efectos
+```
+
+- `scripts/sfx-catalog.json`: la descripción y duración de cada efecto
+  (whoosh, tap, pop, stamp, rise, notification, reward, logo).
+- `src/Sfx.tsx`: en qué cuadro suena cada uno, atado a las animaciones de
+  `src/scenes.tsx`.
+- `public/sfx/manifest.json`: lo escribe el script; el video solo programa
+  los efectos que aparecen ahí, así se puede renderizar aunque falten.

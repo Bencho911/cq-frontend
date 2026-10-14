@@ -1,0 +1,43 @@
+{
+  "_comment": "Descripción de cada efecto para ElevenLabs Text to Sound Effects. Cambiar el texto y volver a generar con `npm run sfx -- <id>`.",
+  "whoosh": {
+    "text": "Short soft airy whoosh, smooth upward swipe transition, clean modern app promo, no reverb tail",
+    "durationSeconds": 0.7,
+    "promptInfluence": 0.6
+  },
+  "tap": {
+    "text": "Single soft UI tap on a phone screen, subtle muted click, clean and dry",
+    "durationSeconds": 0.5,
+    "promptInfluence": 0.7
+  },
+  "pop": {
+    "text": "Small light bubbly pop, friendly UI tag appearing, short and soft",
+    "durationSeconds": 0.5,
+    "promptInfluence": 0.6
+  },
+  "stamp": {
+    "text": "Rubber stamp pressed firmly on paper, short woody thud with a light paper slap, dry",
+    "durationSeconds": 0.6,
+    "promptInfluence": 0.65
+  },
+  "rise": {
+    "text": "Gentle soft paper slide and rise, light rustle of tropical leaves, warm and short",
+    "durationSeconds": 1.2,
+    "promptInfluence": 0.5
+  },
+  "notification": {
+    "text": "Warm pleasant two-note phone notification chime, wooden marimba, short",
+    "durationSeconds": 1.0,
+    "promptInfluence": 0.65
+  },
+  "reward": {
+    "text": "Bright cheerful reward sparkle, small coins and soft marimba arpeggio, celebratory but subtle",
+    "durationSeconds": 1.2,
+    "promptInfluence": 0.6
+  },
+  "logo": {
+    "text": "Warm short logo sting, soft marimba and acoustic guitar strum with a gentle tropical bird chirp, Colombian coffee brand",
+    "durationSeconds": 2.5,
+    "promptInfluence": 0.5
+  }
+}

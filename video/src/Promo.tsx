@@ -4,6 +4,7 @@ import { TransitionSeries, springTiming } from '@remotion/transitions';
 import type { TransitionPresentation, TransitionPresentationComponentProps } from '@remotion/transitions';
 import { S1Hook, S2Order, S3Custom, S4Album, S5Ready, S6Montage, S7End } from './scenes';
 import { SMOOTH, zocaloBg } from './theme';
+import { SoundTrack } from './Sfx';
 
 /**
  * Transición de marca: la escena nueva sube como una fachada y el zócalo
@@ -51,6 +52,9 @@ const SCENES: [React.FC, number][] = [
 
 export const PROMO_DURATION = SCENES.reduce((s, [, d]) => s + d, 0) - T * (SCENES.length - 1);
 
+/** Cuadro en que empieza cada escena (incluye el solape de la transición). */
+const SCENE_STARTS = SCENES.map((_, i) => SCENES.slice(0, i).reduce((s, [, d]) => s + d, 0) - T * i);
+
 export const Promo: React.FC = () => (
   <AbsoluteFill style={{ background: '#fff' }}>
     <TransitionSeries>
@@ -66,5 +70,6 @@ export const Promo: React.FC = () => (
         return items;
       })}
     </TransitionSeries>
+    <SoundTrack sceneStarts={SCENE_STARTS} />
   </AbsoluteFill>
 );
