@@ -41,14 +41,15 @@ const timing = springTiming({ config: SMOOTH, durationInFrames: T });
 
 /** Duraciones de cada escena (las transiciones se solapan T cuadros). */
 const SCENES: [React.FC, number][] = [
-  [S1Hook, 105],
-  [S2Order, 135],
-  [S3Custom, 150],
-  // Álbum +0,5 s y pedido listo -0,5 s: la frase del álbum es la más larga.
-  [S4Album, 195],
-  [S5Ready, 135],
-  [S6Montage, 105],
-  [S7End, 165],
+  // Duraciones ajustadas a la voz (public/vo/voz.mp3): cada escena entra
+  // ~0,35 s antes de su frase, para que la transición termine al hablar.
+  [S1Hook, 133], //   0,0 s  ¿Antojo de un buen café del Quindío?…
+  [S2Order, 122], //  3,9 s  Pídelo antes de llegar…
+  [S3Custom, 133], // 7,5 s  Grande, frío, con un espresso extra…
+  [S4Album, 227], // 11,4 s  Y en cada pedido sumas puntos…
+  [S5Ready, 87], //  18,5 s  Cuando esté listo, te avisamos.
+  [S6Montage, 103], // 20,9 s Menú, pedidos y puntos…
+  [S7End, 185], //   23,8 s  Café Quindío, el café del corazón de Colombia…
 ];
 
 export const PROMO_DURATION = SCENES.reduce((s, [, d]) => s + d, 0) - T * (SCENES.length - 1);
@@ -72,6 +73,6 @@ export const Promo: React.FC = () => (
       })}
     </TransitionSeries>
     <SoundTrack sceneStarts={SCENE_STARTS} />
-    <VoiceTrack sceneStarts={SCENE_STARTS} />
+    <VoiceTrack />
   </AbsoluteFill>
 );

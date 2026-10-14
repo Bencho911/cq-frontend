@@ -1,6 +1,7 @@
 import React from 'react';
 import { Audio, Sequence, staticFile } from 'remotion';
 import manifest from '../public/sfx/manifest.json';
+import { TIMING } from './scenes';
 
 /** Efectos del catálogo (scripts/sfx-catalog.json). */
 type SfxId = 'whoosh' | 'tap' | 'pop' | 'stamp' | 'rise' | 'notification' | 'reward' | 'logo';
@@ -13,41 +14,28 @@ interface Cue {
   volume: number;
 }
 
-// Mismos tiempos que las animaciones de src/scenes.tsx.
-const STAMP_FIRST = 26;
-const STAMP_EVERY = 22;
+const { custom, album, ready, order } = TIMING;
 
 const CUES: Cue[] = [
   { scene: 0, at: 8, id: 'rise', volume: 0.55 },
-  { scene: 1, at: 70, id: 'tap', volume: 0.8 },
-  { scene: 2, at: 40, id: 'pop', volume: 0.45 },
-  { scene: 2, at: 72, id: 'tap', volume: 0.8 },
-  { scene: 2, at: 84, id: 'pop', volume: 0.45 },
-  { scene: 2, at: 100, id: 'pop', volume: 0.45 },
-  // Cada estampilla suena al aterrizar (~10 cuadros después de salir).
-  ...[0, 1, 2, 3, 4].map((i) => ({ scene: 3, at: STAMP_FIRST + i * STAMP_EVERY + 10, id: 'stamp' as const, volume: 0.75 })),
-  { scene: 3, at: STAMP_FIRST + STAMP_EVERY * 5 + 6, id: 'reward', volume: 0.6 },
-  { scene: 4, at: 6, id: 'notification', volume: 0.8 },
-  { scene: 4, at: 92, id: 'reward', volume: 0.55 },
+  { scene: 1, at: order.tap, id: 'tap', volume: 0.8 },
+  { scene: 2, at: custom.tap, id: 'tap', volume: 0.8 },
+  { scene: 2, at: custom.frio, id: 'pop', volume: 0.45 },
+  { scene: 2, at: custom.grande, id: 'pop', volume: 0.45 },
+  { scene: 2, at: custom.espresso, id: 'pop', volume: 0.45 },
+  // Cada estampilla suena al aterrizar.
+  ...[0, 1, 2, 3, 4].map((i) => ({ scene: 3, at: album.firstStamp + i * album.every + album.land, id: 'stamp' as const, volume: 0.75 })),
+  { scene: 3, at: album.firstStamp + album.every * 5 + 6, id: 'reward', volume: 0.6 },
+  { scene: 4, at: ready.note, id: 'notification', volume: 0.8 },
+  { scene: 4, at: ready.card, id: 'reward', volume: 0.55 },
   { scene: 6, at: 4, id: 'logo', volume: 0.8 },
 ];
 
 const files: Partial<Record<SfxId, string>> = manifest.files;
 
-/**
- * Voz en off (guion-voz.md), un archivo por escena en public/vo. `at` es el
- * cuadro dentro de la escena en que entra; varios llevan un pequeño
- * retraso para que la frase anterior termine o para dejar sonar un efecto.
- */
-const VOICE: { file: string; scene: number; at: number }[] = [
-  { file: 'vo-1.mp3', scene: 0, at: 0 },
-  { file: 'vo-2.mp3', scene: 1, at: 15 },
-  { file: 'vo-3.mp3', scene: 2, at: 6 },
-  { file: 'vo-4.mp3', scene: 3, at: -3 },
-  { file: 'vo-5.mp3', scene: 4, at: 20 },
-];
+/** Voz en off en una sola toma (guion-voz.md), desde el primer cuadro. */
+const VOICE = [{ file: 'voz.mp3', at: 0 }];
 
-/** Los efectos bajan a este factor mientras hay voz, para que se entienda. */
 const DUCK = 0.55;
 const VOICE_VOLUME = 0.9;
 
@@ -70,10 +58,10 @@ export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts })
   );
 };
 
-export const VoiceTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts }) => (
+export const VoiceTrack: React.FC = () => (
   <>
     {VOICE.map((v) => (
-      <Sequence key={v.file} from={sceneStarts[v.scene] + v.at} layout="none">
+      <Sequence key={v.file} from={v.at} layout="none">
         <Audio src={staticFile(`vo/${v.file}`)} volume={VOICE_VOLUME} />
       </Sequence>
     ))}

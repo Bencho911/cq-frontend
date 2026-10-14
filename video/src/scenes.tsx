@@ -5,6 +5,19 @@ import { KineticTitle, Phone, Stamp, Tap, useEnter, Zocalo } from './components'
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
+/**
+ * Momentos clave de cada escena, en cuadros desde su inicio. Están
+ * alineados con la voz (public/vo/voz.mp3) y Sfx.tsx los usa para que cada
+ * efecto suene con su animación.
+ */
+export const TIMING = {
+  order: { tap: 70 },
+  custom: { tap: 28, frio: 34, grande: 40, espresso: 56 },
+  // Las estampillas caen con "cada diez, un ave" y el premio con "con cincuenta".
+  album: { firstStamp: 58, every: 16, land: 10 },
+  ready: { note: 2, title: 8, art: 10, zocalo: 6, card: 44 },
+};
+
 /** Empuje de cámara lento y constante: da vida sin distraer. */
 const Push: React.FC<{ from?: number; to?: number; duration: number; children: React.ReactNode }> = ({
   from = 1,
@@ -92,7 +105,7 @@ export const S2Order: React.FC = () => {
       </Body>
       <div style={{ position: 'absolute', left: 160, top: 720 + (1 - phone) * 1300 + lift }}>
         <Phone src="home.jpg" width={760}>
-          <Tap x={98} y={294} at={70} phoneWidth={760} />
+          <Tap x={98} y={294} at={TIMING.order.tap} phoneWidth={760} />
         </Phone>
       </div>
     </AbsoluteFill>
@@ -129,7 +142,7 @@ const Tag: React.FC<{ label: string; delay: number; x: number; y: number; dark?:
 export const S3Custom: React.FC = () => {
   const frame = useCurrentFrame();
   const phone = useEnter(6, SMOOTH, 30);
-  const swap = interpolate(frame, [74, 80], [0, 1], clamp);
+  const swap = interpolate(frame, [TIMING.custom.tap + 2, TIMING.custom.tap + 8], [0, 1], clamp);
   return (
     <AbsoluteFill style={{ background: C.mostaza }}>
       <KineticTitle lines={['Como te', 'gusta.']} delay={4} size={150} style={{ position: 'absolute', left: 84, top: 150 }} />
@@ -140,12 +153,12 @@ export const S3Custom: React.FC = () => {
             src={staticFile('screens/detail-grande.jpg')}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: swap }}
           />
-          <Tap x={313} y={521} at={72} phoneWidth={680} />
+          <Tap x={313} y={521} at={TIMING.custom.tap} phoneWidth={680} />
         </Phone>
       </div>
-      <Tag label="Frío" delay={40} x={50} y={760} />
-      <Tag label="Grande, 20 oz" delay={84} x={30} y={1330} dark />
-      <Tag label="+ Espresso extra" delay={100} x={500} y={1660} />
+      <Tag label="Frío" delay={TIMING.custom.frio} x={50} y={760} />
+      <Tag label="Grande, 20 oz" delay={TIMING.custom.grande} x={30} y={1330} dark />
+      <Tag label="+ Espresso extra" delay={TIMING.custom.espresso} x={500} y={1660} />
     </AbsoluteFill>
   );
 };
@@ -158,8 +171,8 @@ const BIRDS = [
   { src: 'ave-martin.webp', color: C.mostazaSoft, x: 230, y: 1380, r: -4 },
   { src: 'ave-barranquero.webp', color: C.mostaza, x: 560, y: 1370, r: 5 },
 ];
-const STAMP_EVERY = 22;
-const FIRST_STAMP = 26;
+const STAMP_EVERY = TIMING.album.every;
+const FIRST_STAMP = TIMING.album.firstStamp;
 
 export const S4Album: React.FC = () => {
   const frame = useCurrentFrame();
@@ -227,9 +240,10 @@ function enterAt(frame: number, delay: number) {
 
 /* ───────────── 5 · Tu pedido está listo ───────────── */
 export const S5Ready: React.FC = () => {
-  const note = useEnter(6, SMOOTH, 26);
-  const card = useEnter(92, BOUNCY);
-  const art = useEnter(30, SMOOTH, 34);
+  const t = TIMING.ready;
+  const note = useEnter(t.note, SMOOTH, 26);
+  const card = useEnter(t.card, BOUNCY);
+  const art = useEnter(t.art, SMOOTH, 30);
   return (
     <AbsoluteFill style={{ background: C.verde }}>
       {/* Notificación */}
@@ -258,7 +272,7 @@ export const S5Ready: React.FC = () => {
           <div style={{ fontSize: 36, marginTop: 2 }}>Recógelo en la barra de la Tienda Centro.</div>
         </div>
       </div>
-      <KineticTitle lines={['Tu pedido', 'está listo.']} delay={30} size={170} color={C.white} style={{ position: 'absolute', left: 84, top: 470 }} />
+      <KineticTitle lines={['Tu pedido', 'está listo.']} delay={t.title} size={170} color={C.white} style={{ position: 'absolute', left: 84, top: 470 }} />
       <div style={{ position: 'absolute', left: 0, right: 0, top: 860, height: 640, overflow: 'hidden' }}>
         <Img
           src={staticFile('brand/puerta-capibara.webp')}
@@ -266,7 +280,7 @@ export const S5Ready: React.FC = () => {
         />
       </div>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 1500, bottom: 0, background: C.mostaza }} />
-      <Zocalo top={1500} delay={20} />
+      <Zocalo top={1500} delay={t.zocalo} />
       {/* Premio */}
       <div
         style={{
