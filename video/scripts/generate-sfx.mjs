@@ -44,7 +44,12 @@ for (const id of ids) {
   console.log('listo');
 }
 
-// El video solo programa los sonidos que existen en este manifiesto.
-const available = Object.keys(catalog).filter((id) => existsSync(join(outDir, `${id}.mp3`)));
-writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ available }, null, 2) + '\n');
-console.log(`Disponibles: ${available.join(', ') || 'ninguno'}`);
+// El video solo programa los sonidos de este manifiesto. Si existe una
+// versión .wav editada (recortada y nivelada), tiene prioridad sobre el .mp3.
+const files = {};
+for (const id of Object.keys(catalog)) {
+  if (existsSync(join(outDir, `${id}.wav`))) files[id] = `${id}.wav`;
+  else if (existsSync(join(outDir, `${id}.mp3`))) files[id] = `${id}.mp3`;
+}
+writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ files }, null, 2) + '\n');
+console.log(`Disponibles: ${Object.keys(files).join(', ') || 'ninguno'}`);

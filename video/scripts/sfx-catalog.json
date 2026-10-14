@@ -1,42 +1,42 @@
 {
-  "_comment": "Descripción de cada efecto para ElevenLabs Text to Sound Effects. Cambiar el texto y volver a generar con `npm run sfx -- <id>`.",
+  "_comment": "Descripción de cada efecto para ElevenLabs Text to Sound Effects (las mismas usadas en el flow «Promo Café Quindío · efectos de sonido»). Los .wav de public/sfx son la variación elegida, recortada y nivelada a -3 dBFS.",
   "whoosh": {
-    "text": "Short soft airy whoosh, smooth upward swipe transition, clean modern app promo, no reverb tail",
+    "text": "Short soft airy whoosh, quick upward swipe, smooth and clean, no tail",
     "durationSeconds": 0.7,
     "promptInfluence": 0.6
   },
   "tap": {
-    "text": "Single soft UI tap on a phone screen, subtle muted click, clean and dry",
+    "text": "Single soft tap on a phone glass screen, muted crisp click, close-mic, dry",
     "durationSeconds": 0.5,
     "promptInfluence": 0.7
   },
   "pop": {
-    "text": "Small light bubbly pop, friendly UI tag appearing, short and soft",
+    "text": "Small light bubbly pop, soft and short, friendly UI blip",
     "durationSeconds": 0.5,
     "promptInfluence": 0.6
   },
   "stamp": {
-    "text": "Rubber stamp pressed firmly on paper, short woody thud with a light paper slap, dry",
+    "text": "Rubber stamp pressed firmly on paper, short woody thud, dry close-mic",
     "durationSeconds": 0.6,
     "promptInfluence": 0.65
   },
   "rise": {
-    "text": "Gentle soft paper slide and rise, light rustle of tropical leaves, warm and short",
+    "text": "Gentle rustle of tropical leaves rising, soft paper slide, warm and short",
     "durationSeconds": 1.2,
     "promptInfluence": 0.5
   },
   "notification": {
-    "text": "Warm pleasant two-note phone notification chime, wooden marimba, short",
+    "text": "Warm two-note marimba notification chime, bright and short",
     "durationSeconds": 1.0,
     "promptInfluence": 0.65
   },
   "reward": {
-    "text": "Bright cheerful reward sparkle, small coins and soft marimba arpeggio, celebratory but subtle",
+    "text": "Cheerful short marimba arpeggio rising, small sparkle, celebratory and light",
     "durationSeconds": 1.2,
     "promptInfluence": 0.6
   },
   "logo": {
-    "text": "Warm short logo sting, soft marimba and acoustic guitar strum with a gentle tropical bird chirp, Colombian coffee brand",
+    "text": "Warm acoustic guitar strum with soft marimba resolve, gentle and short",
     "durationSeconds": 2.5,
     "promptInfluence": 0.5
   }

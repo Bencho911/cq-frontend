@@ -32,10 +32,10 @@ const CUES: Cue[] = [
   { scene: 6, at: 4, id: 'logo', volume: 0.8 },
 ];
 
-const available = new Set<string>(manifest.available);
+const files: Partial<Record<SfxId, string>> = manifest.files;
 
 /**
- * Pista de efectos. Solo programa los sonidos ya generados (manifest.json),
+ * Pista de efectos. Solo programa los sonidos listados en manifest.json,
  * así el video se puede renderizar aunque falte alguno.
  */
 export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts }) => {
@@ -43,10 +43,10 @@ export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts })
   return (
     <>
       {[...transitions, ...CUES]
-        .filter((c) => available.has(c.id))
+        .filter((c) => files[c.id])
         .map((c, i) => (
           <Sequence key={i} from={sceneStarts[c.scene] + c.at} layout="none">
-            <Audio src={staticFile(`sfx/${c.id}.mp3`)} volume={c.volume} />
+            <Audio src={staticFile(`sfx/${files[c.id]}`)} volume={c.volume} />
           </Sequence>
         ))}
     </>
