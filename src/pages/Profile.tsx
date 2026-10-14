@@ -55,7 +55,7 @@ const MENU_GROUPS: MenuGroup[] = [
     title: 'Beneficios',
     items: [
       { icon: Ticket, label: 'Bonos y cupones', to: '/vouchers', badge: '2 activos' },
-      { icon: Gift, label: 'Programa de lealtad', to: '/loyalty', badge: 'Gold' },
+      { icon: Gift, label: 'Puntos y álbum de aves', to: '/album' },
     ],
   },
   {

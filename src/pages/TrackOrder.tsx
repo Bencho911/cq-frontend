@@ -7,6 +7,7 @@ import { formatCOP } from '../lib/format';
 import { USE_MOCKS } from '../lib/env';
 import OrderReadyModal from '../components/ui/OrderReadyModal';
 import { Button } from '../components/ui/Button';
+import { storeShortName, useSelectedStore } from '../lib/session';
 
 // 1 = tomado, 2 = preparando, 3 = listo
 const TrackOrder = () => {
@@ -17,6 +18,13 @@ const TrackOrder = () => {
   const orderId = (location.state as { orderId?: number } | null)?.orderId ?? null;
   const [step, setStep] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [orderTotal, setOrderTotal] = useState(0);
+  const store = useSelectedStore();
+
+  useEffect(() => {
+    if (!orderId) return;
+    orderService.getOrderById(orderId).then((o) => setOrderTotal(o.montofinal_vent ?? 0)).catch(() => {});
+  }, [orderId]);
 
   useEffect(() => {
     // MOCK: avance simulado (el backend no emite "preparando").
@@ -121,7 +129,15 @@ const TrackOrder = () => {
         </Button>
       </div>
 
-      <OrderReadyModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <OrderReadyModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        orderId={orderId}
+        storeName={store ? storeShortName(store) : null}
+        total={orderTotal}
+        onPickedUp={() => navigate('/rating-review')}
+        onReceipt={orderId ? () => navigate(`/invoice/${orderId}`) : undefined}
+      />
     </div>
   );
 };

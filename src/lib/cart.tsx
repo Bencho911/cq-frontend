@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import type { OrderLine, Product } from './types';
+import { discountedPrice } from './format';
+import { toppingsPrice } from './customization';
 
 export interface CartItem {
   product: Product;
@@ -124,11 +126,20 @@ export function useCart() {
 export function useCartTotals() {
   const { state } = useCart();
   const count = state.items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal = state.items.reduce(
-    (sum, i) => sum + i.quantity * i.product.precio_unitario,
-    0,
-  );
+  // Con descuento aplicado: antes el carrito sumaba el precio de lista
+  // aunque las tarjetas mostraban el precio rebajado.
+  const subtotal = state.items.reduce((sum, i) => sum + i.quantity * itemUnitPrice(i), 0);
   return { count, subtotal, items: state.items };
+}
+
+/** Precio unitario que paga el cliente (con descuento). */
+export function unitPrice(product: Product): number {
+  return discountedPrice(product.precio_unitario, product.descuento);
+}
+
+/** Precio unitario de una línea: producto con descuento más adiciones. */
+export function itemUnitPrice(item: CartItem): number {
+  return unitPrice(item.product) + toppingsPrice(item.toppings);
 }
 
 /** Convierte el carrito a líneas de orden (contrato del backend). */
@@ -136,7 +147,9 @@ export function toOrderLines(items: CartItem[]): OrderLine[] {
   return items.map((i) => ({
     cod_prod: i.product.cod_prod,
     cantidad: i.quantity,
-    precio_unit: i.product.precio_unitario,
+    // Precio con descuento, el mismo que vio el cliente. Confirmar con el
+    // backend si espera precio de lista y aplica el descuento por su cuenta.
+    precio_unit: itemUnitPrice(i),
     nom_prod: i.product.nom_prod,
     url_imagen: i.product.url_imagen,
   }));

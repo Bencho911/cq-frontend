@@ -46,7 +46,7 @@ const Login = () => {
       {/* Overlay crema para legibilidad del formulario */}
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(245, 237, 216, 0.82)' }}
+        style={{ background: 'rgba(255, 255, 255, 0.9)' }}
       />
 
       <motion.div

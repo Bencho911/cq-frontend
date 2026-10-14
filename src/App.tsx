@@ -107,7 +107,8 @@ function App() {
             <Route path="/rating-review" element={<PageWrapper><RatingReview /></PageWrapper>} />
             <Route path="/payment-method" element={<PageWrapper><PaymentMethod /></PageWrapper>} />
             <Route path="/vouchers" element={<PageWrapper><Vouchers /></PageWrapper>} />
-            <Route path="/loyalty" element={<PageWrapper><LoyaltyProgram /></PageWrapper>} />
+            <Route path="/album" element={<PageWrapper><LoyaltyProgram /></PageWrapper>} />
+            <Route path="/loyalty" element={<Navigate to="/album" replace />} />
             <Route path="/privacy" element={<PageWrapper><PrivacySecurity /></PageWrapper>} />
           </Routes>
       </Layout>

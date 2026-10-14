@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 const ONBOARDING_STEPS = [
   {
     id: 1,
-    eyebrow: 'Bienvenido',
     title: 'Elige y personaliza tus bebidas',
     description: 'Crea tu bebida exactamente como la quieres. Temperatura, tamaño, azúcar, toppings — tú decides.',
     image: '/Artes corporativos/Composiciones/composiciones- 2.png',
@@ -14,7 +13,6 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 2,
-    eyebrow: 'Pide en segundos',
     title: 'Rápido y sin filas',
     description: 'Haz tu pedido desde tu celular o en el kiosco. Programa para recoger cuando quieras.',
     image: '/Artes corporativos/Composiciones/composiciones- 4.png',
@@ -22,7 +20,6 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 3,
-    eyebrow: 'Disfruta',
     title: 'Acumula puntos en cada café',
     description: 'Cada pedido suma puntos. Canjéalos por bebidas gratis y beneficios exclusivos del programa Gold.',
     image: '/Artes corporativos/Composiciones/composiciones- 1.png',
@@ -124,16 +121,10 @@ const Onboarding = () => {
             transition={{ duration: 0.3, ease: "easeOut" as any }}
             className="min-h-[110px]"
           >
-            <p
-              className="mb-2 text-[11px] font-bold uppercase tracking-widest"
-              style={{ color: 'var(--color-brand)' }}
-            >
-              {step.eyebrow}
-            </p>
-            <h1 className="mb-2 font-display text-[26px] font-semibold leading-tight tracking-tight text-cream">
+            <h1 className="mb-2 font-display text-[30px] font-extrabold leading-none text-white">
               {step.title}
             </h1>
-            <p className="text-[15px] leading-relaxed text-cream/65">{step.description}</p>
+            <p className="text-[16px] leading-relaxed text-white/80">{step.description}</p>
           </motion.div>
         </AnimatePresence>
 
@@ -146,7 +137,7 @@ const Onboarding = () => {
                 animate={{
                   width: currentStep === index ? 24 : 8,
                   backgroundColor:
-                    currentStep === index ? 'var(--color-brand)' : 'rgba(255,255,255,0.20)',
+                    currentStep === index ? 'var(--color-mostaza)' : 'rgba(255,255,255,0.30)',
                 }}
                 className="h-2 rounded-full"
                 transition={{ duration: 0.25 }}
@@ -157,11 +148,7 @@ const Onboarding = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleNext}
-            className="flex items-center gap-2 rounded-2xl px-6 py-3.5 text-[15px] font-bold text-cream"
-            style={{
-              background: 'var(--color-brand)',
-              boxShadow: 'var(--shadow-brand)',
-            }}
+            className="flex h-[52px] items-center gap-2 rounded-md bg-mostaza px-6 text-[16px] font-bold text-ink"
           >
             <AnimatePresence mode="wait">
               <motion.span
