@@ -1,172 +1,117 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Facade, type FacadeTone } from '../components/brand/Facade';
+import { Stamp } from '../components/brand/Stamp';
+import { BIRDS } from '../lib/loyalty';
 
-const ONBOARDING_STEPS = [
+interface Step {
+  tone: FacadeTone;
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const STEPS: Step[] = [
   {
-    id: 1,
-    title: 'Elige y personaliza tus bebidas',
-    description: 'Crea tu bebida exactamente como la quieres. Temperatura, tamaño, azúcar, toppings — tú decides.',
-    image: '/Artes corporativos/Composiciones/composiciones- 2.png',
-    accentColor: '#49B4AA',
+    tone: 'verde',
+    title: 'Pide antes de llegar.',
+    description: 'Elige, paga y recoge en la barra, sin hacer fila.',
+    image: '/brand/ventana-tucan.webp',
   },
   {
-    id: 2,
-    title: 'Rápido y sin filas',
-    description: 'Haz tu pedido desde tu celular o en el kiosco. Programa para recoger cuando quieras.',
-    image: '/Artes corporativos/Composiciones/composiciones- 4.png',
-    accentColor: '#E8903A',
+    tone: 'mostaza',
+    title: 'Como te gusta.',
+    description: 'Tamaño, leche, azúcar y adiciones: cada bebida a tu manera.',
+    image: '/brand/tucan-flora.webp',
   },
   {
-    id: 3,
-    title: 'Acumula puntos en cada café',
-    description: 'Cada pedido suma puntos. Canjéalos por bebidas gratis y beneficios exclusivos del programa Gold.',
-    image: '/Artes corporativos/Composiciones/composiciones- 1.png',
-    accentColor: '#49B4AA',
+    tone: 'rosa',
+    title: 'Cada 10 puntos, un ave.',
+    description: 'Suma puntos en cada pedido y completa tu álbum. Con 50, tu bebida va por nuestra cuenta.',
   },
 ];
 
+/**
+ * Tres fachadas, una por idea. El cambio entre pasos es un fundido corto:
+ * se ve una sola vez y no debe hacer esperar.
+ */
 const Onboarding = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const step = STEPS[current];
+  const isLast = current === STEPS.length - 1;
+  const light = step.tone === 'verde';
 
-  const step = ONBOARDING_STEPS[currentStep];
-  const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
-
-  const handleNext = () => {
-    if (currentStep < ONBOARDING_STEPS.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      navigate('/register');
-    }
-  };
+  const next = () => (isLast ? navigate('/register') : setCurrent((c) => c + 1));
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden">
-      {/* ── Fondo: wallpaper corporativo de palmas ── */}
-      <div
-        className="absolute inset-0 bg-palmas"
-        style={{
-          backgroundImage: "url('/Artes corporativos/Fondos/fondos de color-Palmas.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'bottom center',
-        }}
-      />
-      {/* Overlay teal oscuro para legibilidad */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(160deg, rgba(15,31,30,0.82) 0%, rgba(26,46,44,0.75) 50%, rgba(36,59,56,0.65) 100%)' }}
-      />
-
-      {/* ── Logo real blanco ── */}
-      <div className="relative z-10 px-6 pt-12">
-        <img
-          src="/Artes corporativos/Logo-Slogan/Logo-Blanco.png"
-          alt="Café Quindío"
-          className="w-40 object-contain"
-        />
-      </div>
-
-      {/* Botón saltar */}
-      <div className="absolute right-5 top-12 z-20">
-        <button
-          onClick={() => navigate('/home')}
-          className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-cream/70 transition-colors hover:text-cream"
+    <div className="flex h-[100dvh] flex-col bg-white">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          className="flex flex-1 flex-col"
         >
-          Saltar
-        </button>
-      </div>
-
-      {/* ── Imagen de composición corporativa ── */}
-      <div className="relative z-10 mt-4 flex w-full flex-1 items-center justify-center px-8">
-        {/* Halo sutil bajo la imagen */}
-        <div
-          className="absolute h-64 w-64 rounded-full transition-colors duration-700"
-          style={{
-            background: `radial-gradient(circle, ${step.accentColor}30 0%, transparent 70%)`,
-          }}
-        />
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={step.id}
-            src={step.image}
-            alt={step.title}
-            initial={{ opacity: 0, x: 60, scale: 0.92 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -60, scale: 0.92 }}
-            transition={{ duration: 0.4, ease: "easeOut" as any }}
-            className="z-10 h-auto max-h-[260px] w-full max-w-[260px] object-contain drop-shadow-2xl"
-          />
-        </AnimatePresence>
-      </div>
-
-      {/* ── Texto + controles ── */}
-      <div
-        className="relative z-10 flex flex-col gap-8 rounded-t-3xl px-6 pb-10 pt-7"
-        style={{
-          background: 'rgba(15, 31, 30, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(73, 180, 170, 0.15)',
-          borderBottom: 'none',
-        }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" as any }}
-            className="min-h-[110px]"
-          >
-            <h1 className="mb-2 font-display text-[30px] font-extrabold leading-none text-white">
-              {step.title}
-            </h1>
-            <p className="text-[16px] leading-relaxed text-white/80">{step.description}</p>
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="flex items-center justify-between">
-          {/* Indicadores de paso */}
-          <div className="flex items-center gap-2">
-            {ONBOARDING_STEPS.map((_, index) => (
-              <motion.div
-                key={index}
-                animate={{
-                  width: currentStep === index ? 24 : 8,
-                  backgroundColor:
-                    currentStep === index ? 'var(--color-mostaza)' : 'rgba(255,255,255,0.30)',
-                }}
-                className="h-2 rounded-full"
-                transition={{ duration: 0.25 }}
+          <Facade tone={step.tone} image={step.image} imageClassName="h-[300px] w-auto max-w-[86%] -mb-1" className="flex-1">
+            <div className="flex items-center justify-between px-6 pt-[max(env(safe-area-inset-top),20px)]">
+              <img
+                src={light ? '/brand/logo-blanco.webp' : '/brand/logo-teal.webp'}
+                alt="Café Quindío"
+                className={`h-6 w-auto ${light ? '' : 'brightness-[0.45] saturate-[1.4]'}`}
               />
-            ))}
-          </div>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={handleNext}
-            className="flex h-[52px] items-center gap-2 rounded-md bg-mostaza px-6 text-[16px] font-bold text-ink"
-          >
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={isLastStep ? 'comenzar' : 'siguiente'}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="flex items-center gap-2"
+              <button
+                onClick={() => navigate('/login')}
+                className={`-mr-3 min-h-[44px] px-3 text-[15px] font-semibold ${light ? 'text-white' : 'text-ink'}`}
               >
-                {isLastStep ? (
-                  <><span>Empezar</span><Check size={18} strokeWidth={2.5} aria-hidden /></>
-                ) : (
-                  <><span>Siguiente</span><ArrowRight size={18} strokeWidth={2.5} aria-hidden /></>
-                )}
-              </motion.span>
-            </AnimatePresence>
-          </motion.button>
+                Ya tengo cuenta
+              </button>
+            </div>
+            <div className="px-6 pt-8">
+              <h1 className="font-display text-[44px] font-extrabold leading-[0.95] tracking-[-0.04em]">{step.title}</h1>
+              <p className={`mt-3 max-w-[320px] text-[17px] leading-snug ${light ? 'text-[#D7ECE9]' : 'text-ink'}`}>
+                {step.description}
+              </p>
+            </div>
+            {!step.image && (
+              <div className="mt-auto flex items-end justify-center gap-2 px-6 pb-6" aria-hidden>
+                {[BIRDS[1], BIRDS[4], BIRDS[2]].map((bird, i) => (
+                  <Stamp
+                    key={bird.id}
+                    bird={bird}
+                    className={`h-[170px] w-[118px] ${i === 1 ? '-translate-y-5' : ''}`}
+                  />
+                ))}
+              </div>
+            )}
+          </Facade>
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="flex items-center justify-between px-6 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-5">
+        <div className="flex gap-1.5" role="tablist" aria-label="Pasos">
+          {STEPS.map((s, i) => (
+            <button
+              key={s.title}
+              role="tab"
+              aria-selected={i === current}
+              aria-label={`Paso ${i + 1} de ${STEPS.length}`}
+              onClick={() => setCurrent(i)}
+              className="grid h-11 place-items-center"
+            >
+              <span className={`block h-2 rounded-full transition-[width] duration-200 ${i === current ? 'w-6 bg-ink' : 'w-2 bg-line'}`} />
+            </button>
+          ))}
         </div>
+        <button
+          onClick={next}
+          className="h-[54px] rounded-md bg-ink px-7 text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
+        >
+          {isLast ? 'Crear mi cuenta' : 'Siguiente'}
+        </button>
       </div>
     </div>
   );

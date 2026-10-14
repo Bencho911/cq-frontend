@@ -28,7 +28,8 @@ interface FacadeProps {
 export function Facade({ tone, image, imageClassName, ground = 'none', className, children }: FacadeProps) {
   return (
     <div className={cn('relative flex flex-col overflow-hidden', WALL[tone], className)}>
-      <div className="relative z-10">{children}</div>
+      {/* Sin ilustración, el contenido ocupa el muro y puede apoyarse en el zócalo. */}
+      <div className={cn('relative z-10', !image && 'flex flex-1 flex-col')}>{children}</div>
       {image && (
         <img
           src={image}
