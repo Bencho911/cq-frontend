@@ -6,10 +6,12 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { PageHeader } from '../components/brand/PageHeader';
 import { Segmented } from '../components/brand/Segmented';
 import { formatCOP } from '../lib/format';
+import { useReorder } from '../lib/reorder';
 
 type OrderStatus = 'pendiente' | 'preparando' | 'listo' | 'completada' | 'cancelada';
 
 interface MockOrderItem {
+  codProd?: number;
   name: string;
   size?: string;
   quantity: number;
@@ -47,8 +49,8 @@ const MOCK_ACTIVE: MockOrder[] = [
     id: 1238,
     status: 'preparando',
     items: [
-      { name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
-      { name: 'Caramel Latte', quantity: 1, unitPrice: 33000 },
+      { codProd: 3, name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
+      { codProd: 5, name: 'Caramel Latte', quantity: 1, unitPrice: 33000 },
     ],
     store: 'Café Quindío · Centro',
     date: 'Hoy, 2:15 p. m.',
@@ -62,8 +64,8 @@ const MOCK_HISTORY: MockOrder[] = [
     id: 1237,
     status: 'completada',
     items: [
-      { name: 'Café con leche', quantity: 1, unitPrice: 25000 },
-      { name: 'Caffè Mocha', quantity: 1, unitPrice: 29000 },
+      { codProd: 1, name: 'Café con leche', quantity: 1, unitPrice: 25000 },
+      { codProd: 4, name: 'Caffè Mocha', quantity: 1, unitPrice: 29000 },
       { name: 'Croissant', quantity: 1, unitPrice: 28000 },
     ],
     store: 'Café Quindío · Norte',
@@ -73,7 +75,7 @@ const MOCK_HISTORY: MockOrder[] = [
   order({
     id: 1236,
     status: 'completada',
-    items: [{ name: 'Cocoa Caramel Latte', quantity: 1, unitPrice: 33000 }],
+    items: [{ codProd: 2, name: 'Cocoa Caramel Latte', quantity: 1, unitPrice: 33000 }],
     store: 'Café Quindío · Centro',
     date: '8 sep, 3:45 p. m.',
     paymentMethod: 'Tarjeta (Wompi)',
@@ -82,8 +84,8 @@ const MOCK_HISTORY: MockOrder[] = [
     id: 1235,
     status: 'completada',
     items: [
-      { name: 'Caramel Latte', quantity: 1, unitPrice: 28000 },
-      { name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
+      { codProd: 5, name: 'Caramel Latte', quantity: 1, unitPrice: 28000 },
+      { codProd: 3, name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
     ],
     store: 'Café Quindío · Aeropuerto',
     date: '5 sep, 9:00 a. m.',
@@ -92,7 +94,7 @@ const MOCK_HISTORY: MockOrder[] = [
   order({
     id: 1234,
     status: 'cancelada',
-    items: [{ name: 'Café con leche', quantity: 1, unitPrice: 25000 }],
+    items: [{ codProd: 1, name: 'Café con leche', quantity: 1, unitPrice: 25000 }],
     store: 'Café Quindío · Centro',
     date: '2 sep, 11:20 a. m.',
     paymentMethod: 'Tarjeta (Wompi)',
@@ -101,7 +103,7 @@ const MOCK_HISTORY: MockOrder[] = [
 
 const shortStore = (name: string) => `Tienda ${name.replace(/^Café Quindío\s*[·-]\s*/i, '')}`;
 
-function OrderRow({ order, onOpen, onReorder }: { order: MockOrder; onOpen: () => void; onReorder?: () => void }) {
+function OrderRow({ order, onOpen, onReorder, busy }: { order: MockOrder; onOpen: () => void; onReorder?: () => void; busy?: boolean }) {
   const status = STATUS_CONFIG[order.status];
   return (
     <li className="border-b border-line">
@@ -130,10 +132,12 @@ function OrderRow({ order, onOpen, onReorder }: { order: MockOrder; onOpen: () =
       {onReorder && (
         <button
           onClick={onReorder}
-          className="mb-4 flex h-11 items-center gap-2 rounded-md border-[1.5px] border-ink px-4 text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.97]"
+          disabled={busy}
+          aria-busy={busy || undefined}
+          className="mb-4 flex h-11 items-center gap-2 rounded-md border-[1.5px] border-ink px-4 text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.97] disabled:opacity-60"
         >
           <RotateCcw size={16} aria-hidden />
-          Repetir pedido
+          {order.status === 'cancelada' ? 'Volver a pedir' : 'Repetir pedido'}
         </button>
       )}
     </li>
@@ -143,6 +147,7 @@ function OrderRow({ order, onOpen, onReorder }: { order: MockOrder; onOpen: () =
 const Orders = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'activos' | 'historial'>('activos');
+  const { reorder, busy } = useReorder();
   const list = activeTab === 'activos' ? MOCK_ACTIVE : MOCK_HISTORY;
 
   return (
@@ -196,7 +201,12 @@ const Orders = () => {
               key={o.id}
               order={o}
               onOpen={() => navigate(`/invoice/${o.id}`, { state: { order: o } })}
-              onReorder={o.status === 'completada' ? () => navigate('/menu') : undefined}
+              busy={busy}
+              onReorder={
+                o.status === 'completada' || o.status === 'cancelada'
+                  ? () => reorder(o.items.map((i) => ({ codProd: i.codProd, name: i.name, quantity: i.quantity, size: i.size })))
+                  : undefined
+              }
             />
           ))}
         </ul>

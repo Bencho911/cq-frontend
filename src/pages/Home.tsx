@@ -7,6 +7,7 @@ import type { Category, Product } from '../lib/types';
 import { useCart, useCartTotals } from '../lib/cart';
 import { discountedPrice, formatCOP } from '../lib/format';
 import { resolveImageUrl } from '../lib/image';
+import { useReorder } from '../lib/reorder';
 import { MOCK_ACCOUNT, summarize } from '../lib/loyalty';
 import {
   MOCK_LAST_ORDER_PRODUCT_IDS,
@@ -81,10 +82,9 @@ const Home = () => {
   );
   const lastOrderTotal = lastOrder.reduce((sum, p) => sum + discountedPrice(p.precio_unitario, p.descuento), 0);
 
-  const reorder = () => {
-    lastOrder.forEach((product) => dispatch({ type: 'ADD', item: { product, quantity: 1 } }));
-    navigate('/checkout');
-  };
+  const { reorder, busy: reordering } = useReorder();
+  const repeatLastOrder = () =>
+    reorder(lastOrder.map((p) => ({ codProd: p.cod_prod, name: p.nom_prod, quantity: 1 })));
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col bg-cream pb-28">
@@ -126,8 +126,10 @@ const Home = () => {
                 {lastOrder.map((p) => p.nom_prod).join(' y ')}, listos en {MOCK_READY_MINUTES} minutos.
               </p>
               <button
-                onClick={reorder}
-                className="mt-3.5 inline-flex h-12 items-center gap-2 rounded-md bg-ink px-4 text-[16px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
+                onClick={repeatLastOrder}
+                disabled={reordering}
+                aria-busy={reordering || undefined}
+                className="mt-3.5 inline-flex h-12 items-center gap-2 rounded-md bg-ink px-4 text-[16px] font-semibold text-white transition-transform duration-150 active:scale-[0.97] disabled:opacity-60"
               >
                 Pedir por <span className="num">{formatCOP(lastOrderTotal)}</span>
               </button>

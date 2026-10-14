@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Minus, Plus, Store, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { itemUnitPrice, useCart, useCartTotals, toOrderLines, type CartItem } from '../lib/cart';
+import { itemUnitPrice, lineKey, useCart, useCartTotals, toOrderLines, type CartItem } from '../lib/cart';
 import { orderService } from '../lib/orderService';
 import { formatCOP } from '../lib/format';
 import { USE_MOCKS } from '../lib/env';
@@ -108,7 +108,7 @@ const Checkout = () => {
         {/* Líneas: el arco solo aparece al armar el pedido */}
         <ul className="px-5 pt-2">
           {items.map((item) => (
-            <li key={item.product.cod_prod} className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-line py-3.5">
+            <li key={lineKey(item)} className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-line py-3.5">
               <Arch tone={archToneFor(item.product.cod_prod)} className="h-[68px] w-14">
                 {item.product.url_imagen && (
                   <img src={resolveImageUrl(item.product.url_imagen)} alt="" className="mb-0.5 w-[46px] object-contain" />
@@ -123,8 +123,8 @@ const Checkout = () => {
                 <button
                   onClick={() =>
                     item.quantity === 1
-                      ? dispatch({ type: 'REMOVE', codProd: item.product.cod_prod })
-                      : dispatch({ type: 'SET_QTY', codProd: item.product.cod_prod, quantity: item.quantity - 1 })
+                      ? dispatch({ type: 'REMOVE', key: lineKey(item) })
+                      : dispatch({ type: 'SET_QTY', key: lineKey(item), quantity: item.quantity - 1 })
                   }
                   aria-label={item.quantity === 1 ? `Quitar ${item.product.nom_prod}` : 'Quitar uno'}
                   className="grid h-full w-10 place-items-center text-ink"
@@ -133,7 +133,7 @@ const Checkout = () => {
                 </button>
                 <span className="num w-5 text-center text-[15px] text-ink">{item.quantity}</span>
                 <button
-                  onClick={() => dispatch({ type: 'SET_QTY', codProd: item.product.cod_prod, quantity: item.quantity + 1 })}
+                  onClick={() => dispatch({ type: 'SET_QTY', key: lineKey(item), quantity: item.quantity + 1 })}
                   aria-label="Agregar uno"
                   className="grid h-full w-10 place-items-center text-ink"
                 >

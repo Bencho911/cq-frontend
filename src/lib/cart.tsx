@@ -28,8 +28,8 @@ interface CartState {
 
 type CartAction =
   | { type: 'ADD'; item: CartItem }
-  | { type: 'REMOVE'; codProd: number }
-  | { type: 'SET_QTY'; codProd: number; quantity: number }
+  | { type: 'REMOVE'; key: string }
+  | { type: 'SET_QTY'; key: string; quantity: number }
   | { type: 'CLEAR' }
   | { type: 'SET_STORE'; storeId: number }
   | { type: 'SET_DELIVERY'; deliveryType: DeliveryType }
@@ -37,6 +37,19 @@ type CartAction =
   | { type: 'SET_PAYMENT_METHOD'; paymentMethod: string | null };
 
 const STORAGE_KEY = 'cq-cart-v1';
+
+/** Identidad de una línea: producto más su personalización. */
+export function lineKey(item: CartItem): string {
+  return [
+    item.product.cod_prod,
+    item.size ?? '',
+    item.variant ?? '',
+    item.sugar ?? '',
+    item.ice ?? '',
+    [...(item.toppings ?? [])].sort().join('+'),
+    item.notes?.trim() ?? '',
+  ].join('|');
+}
 
 const initialState: CartState = {
   items: [],
@@ -49,27 +62,24 @@ const initialState: CartState = {
 function reducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD': {
-      const existing = state.items.find((i) => i.product.cod_prod === action.item.product.cod_prod);
+      // Solo se suman líneas idénticas: un Nitro mediano y uno grande con
+      // espresso extra son dos líneas distintas.
+      const key = lineKey(action.item);
+      const existing = state.items.find((i) => lineKey(i) === key);
       if (existing) {
         return {
           ...state,
-          items: state.items.map((i) =>
-            i.product.cod_prod === action.item.product.cod_prod
-              ? { ...i, quantity: i.quantity + action.item.quantity }
-              : i,
-          ),
+          items: state.items.map((i) => (lineKey(i) === key ? { ...i, quantity: i.quantity + action.item.quantity } : i)),
         };
       }
       return { ...state, items: [...state.items, action.item] };
     }
     case 'REMOVE':
-      return { ...state, items: state.items.filter((i) => i.product.cod_prod !== action.codProd) };
+      return { ...state, items: state.items.filter((i) => lineKey(i) !== action.key) };
     case 'SET_QTY':
       return {
         ...state,
-        items: state.items.map((i) =>
-          i.product.cod_prod === action.codProd ? { ...i, quantity: Math.max(1, action.quantity) } : i,
-        ),
+        items: state.items.map((i) => (lineKey(i) === action.key ? { ...i, quantity: Math.max(1, action.quantity) } : i)),
       };
     case 'CLEAR':
       return { ...state, items: [] };

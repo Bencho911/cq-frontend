@@ -6,8 +6,10 @@ import { PageHeader } from '../components/brand/PageHeader';
 import { formatCOP } from '../lib/format';
 import { orderService } from '../lib/orderService';
 import { useSelectedStore } from '../lib/session';
+import { useReorder } from '../lib/reorder';
 
 interface InvoiceItem {
+  codProd?: number;
   name: string;
   size?: string;
   quantity: number;
@@ -36,8 +38,8 @@ const MOCK_INVOICE: InvoiceData = {
   paymentMethod: 'Tarjeta Visa terminada en 4521 (Wompi)',
   deliveryType: 'Recoger en tienda',
   items: [
-    { name: 'Nitro Cold Brew', size: 'Grande', quantity: 1, unitPrice: 31000 },
-    { name: 'Caramel Latte', size: 'Regular', quantity: 1, unitPrice: 28000 },
+    { codProd: 3, name: 'Nitro Cold Brew', size: 'Grande', quantity: 1, unitPrice: 31000 },
+    { codProd: 5, name: 'Caramel Latte', size: 'Regular', quantity: 1, unitPrice: 28000 },
     { name: 'Espresso extra', quantity: 1, unitPrice: 5000 },
   ],
   discount: 2500,
@@ -53,6 +55,7 @@ const shortStore = (name: string) => `Tienda ${name.replace(/^Café Quindío\s*[
 
 const Invoice = () => {
   const navigate = useNavigate();
+  const { reorder, busy } = useReorder();
   const location = useLocation();
   const { id } = useParams();
   const selectedStore = useSelectedStore();
@@ -80,7 +83,7 @@ const Invoice = () => {
           address: selectedStore?.direccion,
           paymentMethod: o.metodopago_usu ? PAYMENT_LABELS[o.metodopago_usu] ?? o.metodopago_usu : 'Pago en kiosco',
           deliveryType: o.tipo_entrega === 'domicilio' ? 'Domicilio' : 'Recoger en tienda',
-          items: o.items.map((l) => ({ name: l.nom_prod ?? `Producto ${l.cod_prod}`, quantity: l.cantidad, unitPrice: l.precio_unit })),
+          items: o.items.map((l) => ({ codProd: l.cod_prod, name: l.nom_prod ?? `Producto ${l.cod_prod}`, quantity: l.cantidad, unitPrice: l.precio_unit })),
           discount: 0,
         });
       })
@@ -188,8 +191,10 @@ const Invoice = () => {
         {/* Acciones */}
         <div className="mt-8 grid gap-2">
           <button
-            onClick={() => navigate('/menu')}
-            className="flex h-[54px] items-center justify-center gap-2 rounded-md bg-ink text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
+            onClick={() => reorder(items.map((i) => ({ codProd: i.codProd, name: i.name, quantity: i.quantity, size: i.size })))}
+            disabled={busy}
+            aria-busy={busy || undefined}
+            className="flex h-[54px] items-center justify-center gap-2 rounded-md bg-ink text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97] disabled:opacity-60"
           >
             <RotateCcw size={18} aria-hidden />
             Repetir pedido
