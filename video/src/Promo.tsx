@@ -4,7 +4,7 @@ import { TransitionSeries, springTiming } from '@remotion/transitions';
 import type { TransitionPresentation, TransitionPresentationComponentProps } from '@remotion/transitions';
 import { S1Hook, S2Order, S3Custom, S4Album, S5Ready, S6Montage, S7End } from './scenes';
 import { SMOOTH, zocaloBg } from './theme';
-import { SoundTrack } from './Sfx';
+import { SoundTrack, VoiceTrack } from './Sfx';
 
 /**
  * Transición de marca: la escena nueva sube como una fachada y el zócalo
@@ -44,8 +44,9 @@ const SCENES: [React.FC, number][] = [
   [S1Hook, 105],
   [S2Order, 135],
   [S3Custom, 150],
-  [S4Album, 180],
-  [S5Ready, 150],
+  // Álbum +0,5 s y pedido listo -0,5 s: la frase del álbum es la más larga.
+  [S4Album, 195],
+  [S5Ready, 135],
   [S6Montage, 105],
   [S7End, 165],
 ];
@@ -71,5 +72,6 @@ export const Promo: React.FC = () => (
       })}
     </TransitionSeries>
     <SoundTrack sceneStarts={SCENE_STARTS} />
+    <VoiceTrack sceneStarts={SCENE_STARTS} />
   </AbsoluteFill>
 );

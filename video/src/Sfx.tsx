@@ -35,6 +35,23 @@ const CUES: Cue[] = [
 const files: Partial<Record<SfxId, string>> = manifest.files;
 
 /**
+ * Voz en off (guion-voz.md), un archivo por escena en public/vo. `at` es el
+ * cuadro dentro de la escena en que entra; varios llevan un pequeño
+ * retraso para que la frase anterior termine o para dejar sonar un efecto.
+ */
+const VOICE: { file: string; scene: number; at: number }[] = [
+  { file: 'vo-1.mp3', scene: 0, at: 0 },
+  { file: 'vo-2.mp3', scene: 1, at: 15 },
+  { file: 'vo-3.mp3', scene: 2, at: 6 },
+  { file: 'vo-4.mp3', scene: 3, at: -3 },
+  { file: 'vo-5.mp3', scene: 4, at: 20 },
+];
+
+/** Los efectos bajan a este factor mientras hay voz, para que se entienda. */
+const DUCK = 0.55;
+const VOICE_VOLUME = 0.9;
+
+/**
  * Pista de efectos. Solo programa los sonidos listados en manifest.json,
  * así el video se puede renderizar aunque falte alguno.
  */
@@ -46,9 +63,19 @@ export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts })
         .filter((c) => files[c.id])
         .map((c, i) => (
           <Sequence key={i} from={sceneStarts[c.scene] + c.at} layout="none">
-            <Audio src={staticFile(`sfx/${files[c.id]}`)} volume={c.volume} />
+            <Audio src={staticFile(`sfx/${files[c.id]}`)} volume={c.volume * (VOICE.length > 0 ? DUCK : 1)} />
           </Sequence>
         ))}
     </>
   );
 };
+
+export const VoiceTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts }) => (
+  <>
+    {VOICE.map((v) => (
+      <Sequence key={v.file} from={sceneStarts[v.scene] + v.at} layout="none">
+        <Audio src={staticFile(`vo/${v.file}`)} volume={VOICE_VOLUME} />
+      </Sequence>
+    ))}
+  </>
+);
