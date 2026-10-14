@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 /* ─────────────────────────────────────────────────────────────
    Café Quindío — Design System v3 (Identidad Corporativa Real)
@@ -30,13 +29,14 @@
   --color-line: #D8CBAD;
   --color-line-dark: #2E3D3A;      /* bordes en fondos oscuros */
   --color-muted: #7A6A4A;
-  --color-muted-soft: #A09070;
+  --color-muted-soft: #76664A;      /* 4.7:1 sobre crema (antes 2.7:1) */
   --color-muted-strong: #5A4A2A;
 
   /* ── Brand principal: TEAL de Café Quindío ── */
-  --color-brand: #49B4AA;          /* teal del logo */
-  --color-brand-strong: #35887F;   /* hover / pressed */
-  --color-brand-deep: #266059;     /* activos muy marcados */
+  --color-brand: #287068;          /* teal de acción: 5.0:1 con texto crema */
+  --color-brand-logo: #49B4AA;     /* teal del logo: solo decorativo, no para texto */
+  --color-brand-strong: #1F5E57;   /* hover / pressed */
+  --color-brand-deep: #184A44;     /* activos muy marcados */
   --color-brand-soft: #D6F0ED;     /* chips, badges suaves */
   --color-brand-dark: #1A3532;     /* teal sobre oscuro (secciones hero) */
 
@@ -44,7 +44,7 @@
   --color-accent: #E8903A;         /* dorado naranja protagonista */
   --color-accent-bright: #F5A552;  /* hover / énfasis */
   --color-accent-soft: #FAE0BC;    /* fondos suaves */
-  --color-accent-deep: #B86D1E;    /* texto sobre claro */
+  --color-accent-deep: #9A4F12;    /* texto sobre claro: 5.7:1 */
   --color-accent-glow: rgba(232, 144, 58, 0.28);
 
   /* ── Nogal (variante marrón del logo) ── */
@@ -98,6 +98,16 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+  }
+
+  /* Toque inmediato (sin retraso de doble toque) y sin selección de texto
+     al mantener presionado un control. El contenido sigue siendo seleccionable. */
+  button, a, [role="button"], label {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 
   body {
@@ -200,15 +210,6 @@
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-}
-
-/* ── Pulso sutil para badge del carrito ── */
-@keyframes cart-pulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.1); }
-}
-.cart-pulse {
-  animation: cart-pulse 2s ease-in-out infinite;
 }
 
 /* ── Patrón de grano (textura colonial sutil) ── */

@@ -8,19 +8,18 @@ interface ProductCardProps {
   product: Product;
   onAdd: (product: Product) => void;
   onClick?: (product: Product) => void;
+  /** @deprecated Ya no se usa: las tarjetas no tienen entrada escalonada. */
   index?: number;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, onClick, index = 0 }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, onClick }) => {
   const finalPrice = discountedPrice(product.precio_unitario, product.descuento);
   const hasDiscount = Boolean(product.descuento && product.descuento > 0);
 
   return (
+    // Sin entrada escalonada al hacer scroll: es una lista que se recorre a
+    // diario y la animación solo retrasaba el contenido.
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-30px' }}
-      transition={{ duration: 0.38, delay: Math.min(index * 0.05, 0.3), ease: "easeOut" as any }}
       whileTap={{ scale: 0.99 }}
       onClick={() => onClick?.(product)}
       className={`flex items-center gap-3.5 overflow-hidden rounded-2xl bg-surface p-3 ${onClick ? 'cursor-pointer' : ''}`}
@@ -42,7 +41,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, onClic
         )}
         {hasDiscount && (
           <div
-            className="absolute left-0 top-0 rounded-br-lg px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-cream"
+            className="absolute left-0 top-0 rounded-br-lg px-1.5 py-0.5 text-[11px] font-bold text-ink"
             style={{ background: 'var(--color-accent)' }}
           >
             -{product.descuento}%
@@ -70,14 +69,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, onClic
           </div>
 
           <motion.button
-            whileTap={{ scale: 0.8 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             onClick={(e) => {
               e.stopPropagation();
               onAdd(product);
             }}
             aria-label={`Agregar ${product.nom_prod}`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-cream transition-opacity hover:opacity-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-cream transition-colors hover:bg-brand-strong"
           >
             <Plus size={18} strokeWidth={2.5} aria-hidden />
           </motion.button>

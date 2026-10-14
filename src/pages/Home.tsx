@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, type Transition } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Coffee, MapPin, Search, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bell, Coffee, MapPin, Search, ShoppingBag } from 'lucide-react';
 import { productService } from '../lib/productService';
 import type { Category, Product } from '../lib/types';
 import { useCart, useCartTotals } from '../lib/cart';
-import { formatCOP } from '../lib/format';
+import { discountedPrice, formatCOP } from '../lib/format';
 import { ProductCard } from '../components/ui/ProductCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -33,22 +33,10 @@ const BANNERS = [
     src: '/Artes corporativos/Composiciones/composiciones- 4.png',
     label: 'Tradición colombiana',
     sub: 'Pide ya y recoge en minutos',
-    bg: '#E8D5F0',
+    bg: '#F2E8CC',
     href: '/menu',
   },
 ];
-
-const stagger = {
-  initial: {},
-  animate: { transition: { staggerChildren: 0.07 } },
-};
-
-// Transición tipada explícitamente en vez de castear `ease` con `as any`.
-const EASE_OUT_TRANSITION: Transition = { duration: 0.4, ease: 'easeOut' };
-const fadeUp = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: EASE_OUT_TRANSITION },
-};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -83,15 +71,8 @@ const Home = () => {
 
   useEffect(() => { load(); }, []);
 
-  useEffect(() => {
-    if (loading) return;
-    const interval = setInterval(() => {
-      const next = activeBanner >= BANNERS.length - 1 ? 0 : activeBanner + 1;
-      setActiveBanner(next);
-      carouselRef.current?.scrollTo({ left: next * (carouselRef.current?.clientWidth ?? 0), behavior: 'smooth' });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [loading, activeBanner]);
+  // Sin avance automático: un carrusel que se mueve solo no se puede pausar
+  // (WCAG 2.2.2) y cambia el contenido mientras la persona lo está leyendo.
 
   const featuredProducts = useMemo(
     () => products.filter((p) => p.descuento && p.descuento > 0).slice(0, 2),
@@ -130,34 +111,35 @@ const Home = () => {
     <div className="relative flex min-h-[100dvh] flex-col pb-28">
       {/* ── Header con logo real de Café Quindío ── */}
       <div className="sticky top-0 z-[20] border-b border-line bg-cream/90 px-5 pb-3 pt-safe-top pt-5 backdrop-blur-xl">
-        <motion.div variants={stagger} initial="initial" animate="animate" className="mb-3 flex items-center justify-between">
-          <motion.div variants={fadeUp}>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
             {/* Logo real de la empresa */}
             <img
               src="/Artes corporativos/Logo-Slogan/Logos-Slogan-Café.png"
               alt="Café Quindío"
               className="w-36 object-contain"
             />
-            <p className="mt-0.5 text-[12px] font-medium text-muted">{greeting} ☀️</p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="flex items-center gap-1">
+            <p className="mt-0.5 text-[12px] font-medium text-muted">{greeting}</p>
+          </div>
+          <div className="flex items-center gap-1">
             <button
               onClick={() => navigate('/stores')}
               aria-label="Elegir tienda"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand-soft"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand-soft"
             >
               <MapPin size={20} aria-hidden />
             </button>
             <button
               onClick={() => navigate('/notifications')}
               aria-label="Notificaciones"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand-soft"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand-soft"
             >
+              {/* El punto rojo estaba fijo en el código: debe salir del conteo
+                  real de notificaciones sin leer cuando exista en la API. */}
               <Bell size={20} aria-hidden />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-cream" />
             </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Buscador */}
         <div className="relative">
@@ -172,9 +154,8 @@ const Home = () => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar bebidas, pasteles y más…"
             aria-label="Buscar productos"
-            className="h-11 w-full rounded-full border border-line bg-surface pl-11 pr-11 text-[14px] font-medium text-ink outline-none placeholder:text-muted-soft transition-colors focus:border-brand"
+            className="h-11 w-full rounded-full border border-line bg-surface pl-11 pr-4 text-[16px] font-medium text-ink outline-none placeholder:text-muted-soft transition-colors focus:border-brand"
           />
-          <Coffee size={17} className="pointer-events-none absolute inset-y-0 right-4 my-auto text-brand" aria-hidden />
         </div>
       </div>
 
@@ -231,19 +212,14 @@ const Home = () => {
       {/* ── En especial hoy ── */}
       {!loading && featuredProducts.length > 0 && (
         <div className="mt-6 px-5">
-          <div className="mb-3 flex items-center gap-2">
-            <Sparkles size={16} className="text-accent" aria-hidden />
-            <h2 className="text-[14px] font-bold uppercase tracking-widest text-accent-deep">Hoy en especial</h2>
-          </div>
+          <h2 className="mb-3 text-[17px] font-bold text-ink">Hoy en especial</h2>
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
             {featuredProducts.map((p) => {
-              // Asume que `precio_unitario` ya es el precio CON descuento
-              // aplicado, y reconstruye el original para el tachado. Si tu
-              // backend guarda el precio original por separado, úsalo
-              // directamente en vez de este cálculo.
-              const originalPrice = p.descuento
-                ? Math.round(p.precio_unitario / (1 - p.descuento / 100))
-                : null;
+              // `precio_unitario` es el precio de lista (igual que en
+              // ProductCard). Antes aquí se trataba como precio ya rebajado y
+              // el mismo producto mostraba precios distintos en Inicio y Menú.
+              const finalPrice = discountedPrice(p.precio_unitario, p.descuento);
+              const originalPrice = p.descuento ? p.precio_unitario : null;
 
               return (
                 <motion.button
@@ -259,7 +235,7 @@ const Home = () => {
                     )}
                     {p.descuento && (
                       <div
-                        className="absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-cream"
+                        className="absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[11px] font-bold text-ink"
                         style={{ background: 'var(--color-accent)' }}
                       >
                         -{p.descuento}%
@@ -274,7 +250,7 @@ const Home = () => {
                           {formatCOP(originalPrice)}
                         </span>
                       )}
-                      <p className="text-[13px] font-bold text-accent">{formatCOP(p.precio_unitario)}</p>
+                      <p className="text-[13px] font-bold text-accent-deep">{formatCOP(finalPrice)}</p>
                     </div>
                   </div>
                 </motion.button>

@@ -94,7 +94,7 @@ const Menu = () => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="¿Qué se te antoja hoy?"
             aria-label="Buscar en el menú"
-            className="h-11 w-full rounded-2xl border border-line bg-surface pl-4 pr-11 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
+            className="h-11 w-full rounded-2xl border border-line bg-surface pl-4 pr-11 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
           />
           <Search size={18} className="pointer-events-none absolute inset-y-0 right-4 my-auto text-muted-soft" aria-hidden />
         </div>

@@ -1,11 +1,11 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, UtensilsCrossed, ClipboardList, User } from 'lucide-react';
+import { Home, Coffee, ClipboardList, User } from 'lucide-react';
 
 const navItems = [
   { to: '/home', icon: Home, label: 'Inicio' },
-  { to: '/menu', icon: UtensilsCrossed, label: 'Menú' },
-  { to: '/orders', icon: ClipboardList, label: 'Historial' },
+  { to: '/menu', icon: Coffee, label: 'Menú' },
+  { to: '/orders', icon: ClipboardList, label: 'Pedidos' },
   { to: '/profile', icon: User, label: 'Perfil' },
 ];
 
@@ -78,7 +78,7 @@ const BottomNav = () => {
                         aria-hidden
                       />
                       <span
-                        className={`text-[10px] font-semibold tracking-tight transition-colors duration-200 ${
+                        className={`text-[11px] font-semibold transition-colors duration-200 ${
                           isActive ? 'text-brand' : 'text-muted-soft'
                         }`}
                       >

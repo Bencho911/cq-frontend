@@ -35,7 +35,7 @@ const Vouchers = () => {
             type="text"
             placeholder="Introduce el código del vale aquí."
             aria-label="Código de cupón"
-            className="h-12 w-full rounded-2xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
+            className="h-12 w-full rounded-2xl border border-line bg-surface px-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
           />
           <div className="mt-3">
           </div>

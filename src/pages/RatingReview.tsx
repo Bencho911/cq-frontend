@@ -65,7 +65,7 @@ const RatingReview = () => {
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder="Cuéntanos sobre tu experiencia con el pedido."
-            className="h-[120px] w-full resize-none rounded-2xl border border-line bg-surface p-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
+            className="h-[120px] w-full resize-none rounded-2xl border border-line bg-surface p-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
           />
           <p className="mt-2 text-[12px] text-muted">Las reseñas serán visibles para el público.</p>
           <div className="mt-3">

@@ -183,7 +183,7 @@ const Orders = () => {
                 {tab === 'activos' ? 'En proceso' : 'Historial'}
               </span>
               {tab === 'activos' && MOCK_ACTIVE.length > 0 && (
-                <span className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-[10px] font-bold text-cream">
+                <span className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-[10px] font-bold text-ink">
                   {MOCK_ACTIVE.length}
                 </span>
               )}

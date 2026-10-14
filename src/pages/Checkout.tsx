@@ -167,7 +167,7 @@ const Checkout = () => {
                     id="delivery-address"
                     type="text"
                     placeholder="Ej. Calle 12 #9-34"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
+                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -176,7 +176,7 @@ const Checkout = () => {
                     id="delivery-apt"
                     type="text"
                     placeholder="Ej. Apto 301"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
+                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -185,7 +185,7 @@ const Checkout = () => {
                     id="delivery-refs"
                     type="text"
                     placeholder="Ej. Casa de color azul, portón blanco"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
+                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
                   />
                 </div>
               </div>

@@ -177,7 +177,7 @@ const ProductDetailSheet = ({ product, isOpen, onClose, onAddToCart }: ProductDe
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Opcional"
-                className="h-[100px] w-full resize-none rounded-2xl border border-line bg-surface p-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
+                className="h-[100px] w-full resize-none rounded-2xl border border-line bg-surface p-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
               />
             </div>
           </div>
