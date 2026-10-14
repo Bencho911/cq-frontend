@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dirección unificada · Café Quindío</title>
+<style>
+/*
+  DIRECCIÓN UNIFICADA
+  Base: Fachadas de Salento (color plano, puertas pintadas, azul tinta).
+  Arco de ventana colonial: solo al armar el pedido (producto y carrito).
+  Estampilla perforada con aves: solo en lealtad (álbum y premio del pedido).
+  Cada forma tiene un único trabajo, así la mezcla se lee como un sistema.
+  Tipos: Bricolage Grotesque (titulares, cifras grandes) + Neutra Text (UI).
+*/
+@font-face { font-family: Brico; src: url(fonts/BricolageGrotesque.woff2) format('woff2'); font-weight: 200 800; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Book.otf); font-weight: 400; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Demi.otf); font-weight: 600; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Bold.otf); font-weight: 700; }
+@font-face { font-family: NeutraTF; src: url(fonts/NeutraTextTF-Demi.otf); font-weight: 600; }
+
+:root {
+  --cal: #FFFFFF;
+  --tinta: #18303C;     /* texto y acción principal: 13.8:1 con blanco */
+  --tinta-2: #4E5F68;   /* secundario: 6.6:1 */
+  --linea: #E3E7E9;
+  --mostaza: #E6A90E;   /* tinta encima 6.6:1 */
+  --mostaza-s: #F8E7B6;
+  --rosa: #E66C92;      /* tinta encima 4.5:1 */
+  --rosa-s: #F8DCE5;
+  --teal: #62AAA9;      /* tinta encima 5.1:1 */
+  --teal-s: #DDEEEC;
+  --verde: #1D6B64;     /* blanco encima 6.3:1 */
+  --rojo: #C2391F;      /* blanco encima 5.4:1 */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #D8D6D2; font-family: Neutra, system-ui, sans-serif; color: var(--tinta);
+  display: flex; gap: 40px; justify-content: center; align-items: flex-start; padding: 40px; flex-wrap: wrap; }
+.phone { width: 390px; height: 844px; background: var(--cal); position: relative; overflow: hidden;
+  border-radius: 44px; box-shadow: 0 30px 60px rgba(24,48,60,.2); flex: none; }
+.label { position: absolute; top: -28px; left: 8px; font: 600 14px Neutra; color: var(--tinta-2); }
+.wrap { position: relative; }
+.status { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px;
+  font: 600 16px/1 NeutraTF, Neutra; position: relative; z-index: 3; }
+.sb { display: flex; gap: 6px; align-items: center; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:active { transform: scale(0.97); transition: transform 120ms var(--ease-out); }
+.num { font-family: NeutraTF, Neutra; font-weight: 600; font-variant-numeric: tabular-nums; }
+.b { font-family: Brico, Neutra, sans-serif; font-weight: 800; letter-spacing: -0.025em; font-variation-settings: "opsz" 96; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 22px; }
+.primary { height: 54px; border-radius: 6px; background: var(--tinta); color: #fff; font-size: 17px; font-weight: 600;
+  display: flex; justify-content: space-between; align-items: center; padding: 0 18px; width: 100%; }
+.zocalo { height: 10px; background: repeating-linear-gradient(90deg, var(--rojo) 0 28px, var(--tinta) 28px 32px); }
+
+/* Estampilla: solo lealtad */
+.stamp { --c: var(--rosa); --r: 4px; padding: calc(2 * var(--r)); position: relative;
+  background:
+    radial-gradient(var(--r), #0000 97%, var(--c)) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) / calc(3 * var(--r)) calc(3 * var(--r)),
+    linear-gradient(var(--c) 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r)); }
+.stamp > .in { height: 100%; position: relative; overflow: hidden; display: grid; place-items: center; }
+
+/* Arco: solo al armar el pedido */
+.arch { border-radius: 999px 999px 0 0; overflow: hidden; }
+
+/* ── Inicio ── */
+.bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px 0; }
+.bar img { height: 24px; filter: brightness(.55) saturate(1.3); }
+.store { height: 40px; padding: 0 12px 0 10px; border-radius: 20px; background: #EEF3F3;
+  display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; }
+.hello { font-size: 34px; line-height: .98; padding: 18px 20px 0; }
+.hello span { display: block; color: var(--tinta-2); font-weight: 700; }
+.door { margin-top: 18px; background: var(--mostaza); padding: 18px 20px 20px; display: grid; grid-template-columns: 1fr 120px; gap: 10px; }
+.door h2 { font-size: 25px; line-height: 1; }
+.door p { font-size: 15px; margin-top: 6px; line-height: 1.35; }
+.door .go { margin-top: 14px; height: 46px; padding: 0 16px; background: var(--tinta); color: #fff; border-radius: 6px; font-size: 16px; font-weight: 600; }
+.door .win { align-self: end; height: 124px; background: #fff; border-radius: 56px 56px 0 0; margin-bottom: -20px;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+.door .win img { width: 62px; } .door .win img + img { margin-left: -20px; }
+.doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 18px 20px 0; }
+.d { height: 150px; border-radius: 52px 52px 6px 6px; position: relative; overflow: hidden; display: flex;
+  flex-direction: column; justify-content: flex-end; padding: 0 12px 12px; text-align: left; }
+.d img { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); height: 66px; }
+.d b { font-size: 18px; line-height: 1; position: relative; }
+.d small { font-size: 13px; line-height: 1.2; position: relative; margin-top: 4px; }
+.d.teal { background: var(--teal); } .d.rosa { background: var(--rosa); } .d.verde { background: var(--verde); color: #fff; }
+.teaser { margin: 18px 20px 0; display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center;
+  padding: 10px 12px 10px 10px; border: 1.5px solid var(--tinta); border-radius: 6px; }
+.teaser .stamp { width: 64px; height: 76px; --c: var(--mostaza); }
+.teaser .in img { height: 60px; filter: grayscale(1) brightness(0); opacity: .18; }
+.teaser b { font-size: 16px; display: block; }
+.teaser small { font-size: 14px; color: var(--tinta-2); }
+.teaser .count { font-size: 22px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: var(--tinta); color: #9FB0B8;
+  display: flex; justify-content: space-around; padding-top: 10px; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; width: 72px; }
+.tab.on { color: #fff; font-weight: 700; }
+.tab.on::after { content: ""; width: 18px; height: 3px; background: var(--mostaza); border-radius: 2px; margin-top: 2px; }
+
+/* ── Producto (arco) ── */
+.pd-nav { position: absolute; top: 54px; left: 12px; right: 12px; display: flex; justify-content: space-between; z-index: 2; }
+.pd-nav .icon-btn { background: #fff; box-shadow: 0 1px 4px rgba(24,48,60,.14); }
+.pd-top { height: 360px; position: relative; display: grid; place-items: end center; }
+.pd-top .arch { position: absolute; left: 32px; right: 32px; top: 60px; bottom: 0; background: var(--teal-s); }
+.pd-top .hero { position: relative; width: 180px; margin-bottom: 10px; }
+.pd-top .flora { position: absolute; width: 120px; left: 10px; bottom: -6px; }
+.pd { padding: 20px 20px 0; }
+.pd h1 { font-size: 30px; line-height: 1; }
+.pd .desc { font-size: 16px; color: var(--tinta-2); margin-top: 8px; line-height: 1.45; }
+.opt { margin-top: 20px; }
+.opt h5 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.seg button { height: 54px; border-radius: 6px; border: 1.5px solid var(--linea); font-size: 15px; font-weight: 600; line-height: 1.15; }
+.seg button small { display: block; font-size: 12px; font-weight: 400; color: var(--tinta-2); }
+.seg .on { background: var(--tinta); border-color: var(--tinta); color: #fff; } .seg .on small { color: #BFD0D6; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips button { height: 40px; padding: 0 14px; border-radius: 6px; border: 1.5px solid var(--linea); font-size: 15px; }
+.chips .on { border-color: var(--tinta); font-weight: 700; }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 30px; background: #fff; border-top: 1px solid var(--linea); }
+
+/* ── Carrito (arcos pequeños + premio) ── */
+.top-title { display: flex; align-items: center; gap: 4px; padding: 6px 12px 0; }
+.top-title h1 { font-size: 26px; }
+.pickup { margin: 14px 20px 0; padding: 14px 16px; background: var(--teal-s); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.pickup small { font-size: 13px; color: var(--tinta-2); display: block; }
+.pickup b { font-size: 16px; }
+.pickup button { font-size: 15px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+.lines { padding: 8px 20px 0; }
+.line { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--linea); }
+.line .arch { width: 56px; height: 68px; display: flex; align-items: flex-end; justify-content: center; }
+.line .arch img { width: 46px; margin-bottom: 2px; }
+.line b { font-size: 16px; display: block; }
+.line small { font-size: 14px; color: var(--tinta-2); }
+.qty { display: flex; align-items: center; gap: 2px; border: 1.5px solid var(--linea); border-radius: 6px; height: 40px; }
+.qty button { width: 40px; height: 40px; font: 600 22px/1 Neutra; display: grid; place-items: center; }
+.prize { margin: 18px 20px 0; display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: center; }
+.prize .stamp { width: 72px; height: 88px; --c: var(--mostaza); }
+.prize .in img { height: 70px; }
+.prize b { font-size: 17px; display: block; }
+.prize small { font-size: 14px; color: var(--tinta-2); line-height: 1.35; display: block; margin-top: 2px; }
+.totals { margin: 18px 20px 0; display: flex; justify-content: space-between; font-size: 16px; }
+.totals .num { font-size: 20px; }
+
+/* ── Álbum ── */
+.al-head { padding: 0 20px; }
+.al-head .icon-btn { margin-left: -10px; }
+.al-head h1 { font-size: 34px; line-height: 1; margin-top: 4px; }
+.al-head p { font-size: 15px; color: var(--tinta-2); margin-top: 8px; line-height: 1.4; }
+.meter { margin-top: 14px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.meter i { height: 8px; border-radius: 2px; background: var(--tinta); } .meter i.off { background: var(--linea); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; padding: 20px 20px 0; }
+.slot .stamp { height: 164px; }
+.slot .in img { height: 128px; }
+.slot .nm { font-size: 15px; font-weight: 700; margin-top: 7px; }
+.slot .dt { font-size: 13px; color: var(--tinta-2); }
+.slot.next .stamp { --c: var(--mostaza); } .slot.next .in img { filter: grayscale(1) brightness(0); opacity: .16; }
+.slot.locked .stamp { --c: #F0F1F2; } .slot.locked .in img { filter: grayscale(1) brightness(0); opacity: .08; }
+.slot.locked .in::after { content: "?"; position: absolute; font: 800 44px Brico; color: var(--tinta-2); opacity: .5; }
+
+/* ── Listo ── */
+.ready { background: var(--verde); color: #fff; }
+.ready .txt { padding: 24px 24px 0; }
+.ready .tag { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 16px; background: rgba(255,255,255,.14); font-size: 14px; font-weight: 600; }
+.ready .tag i { width: 8px; height: 8px; border-radius: 4px; background: var(--mostaza); }
+.ready h1 { font-size: 54px; line-height: .92; letter-spacing: -0.045em; margin-top: 16px; }
+.ready p { font-size: 17px; line-height: 1.4; margin-top: 12px; color: #D7ECE9; }
+.ready p b { color: #fff; }
+.ready .won { position: absolute; left: 20px; right: 20px; bottom: 186px; background: #fff; color: var(--tinta); border-radius: 6px;
+  display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: center; padding: 12px; z-index: 2; }
+.ready .won .stamp { width: 72px; height: 88px; --c: var(--mostaza); }
+.ready .won .in img { height: 72px; }
+.ready .won b { font-size: 17px; display: block; }
+.ready .won small { font-size: 14px; color: var(--tinta-2); }
+.ready .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 160px; background: var(--mostaza); }
+.ready .ground::before { content: ""; position: absolute; top: -10px; left: 0; right: 0; height: 10px; background: repeating-linear-gradient(90deg, var(--rojo) 0 28px, var(--tinta) 28px 32px); }
+.ready .art { position: absolute; right: 24px; bottom: 312px; width: 170px; }
+.ready .actions { position: absolute; left: 20px; right: 20px; bottom: 34px; display: grid; gap: 6px; z-index: 2; }
+.ready .ghost { height: 48px; color: var(--tinta); font-weight: 600; font-size: 16px; }
+.caption { width: 100%; text-align: center; font: 400 15px Neutra; color: var(--tinta-2); margin-bottom: 8px; }
+.caption b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<p class="caption"><b>Dirección unificada.</b> Fachadas como base · Arco al armar el pedido · Estampillas en la lealtad.</p>
+
+<template id="sb"><span class="sb"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"/></svg></span></template>
+<template id="tabs"><nav class="tabbar">
+  <div class="tab" data-t="Inicio"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</div>
+  <div class="tab" data-t="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4zM6 2v2M10 2v2M14 2v2"/></svg>Menú</div>
+  <div class="tab" data-t="Álbum"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h7v16H4zM13 4h7v16h-7z"/></svg>Álbum</div>
+  <div class="tab" data-t="Pedidos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/></svg>Pedidos</div>
+</nav></template>
+
+<!-- 1 · INICIO -->
+<div class="wrap"><span class="label">1 · Inicio</span>
+<div class="phone" data-tab="Inicio">
+  <div class="status"><span class="num">9:41</span></div>
+  <div class="bar">
+    <img src="img/logo-teal.png" alt="Café Quindío">
+    <button class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Centro<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>
+  </div>
+  <h1 class="hello b">Buenas tardes,<span>Santiago.</span></h1>
+  <section class="door">
+    <div>
+      <h2 class="b">¿Lo de siempre?</h2>
+      <p>Nitro Cold Brew y Caramel Latte, listos en 6 minutos.</p>
+      <button class="go">Pedir por <span class="num">$56.200</span></button>
+    </div>
+    <div class="win"><img src="../public/nitro.svg" alt=""><img src="../public/caramel_latte.svg" alt=""></div>
+  </section>
+  <div class="zocalo"></div>
+  <div class="doors">
+    <button class="d teal"><img src="img/cafe-rama.png" alt=""><b class="b">Café</b><small>Tintos, lattes y fríos</small></button>
+    <button class="d rosa"><img src="img/heliconia.png" alt="" style="filter:brightness(1.6) saturate(.7)"><b class="b">Sin café</b><small>Chocolates y aromáticas</small></button>
+    <button class="d verde"><img src="img/palma.png" alt=""><b class="b">Pastelería</b><small>Para acompañar</small></button>
+  </div>
+  <div class="teaser">
+    <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
+    <div><b>Tu próxima ave: Barranquero</b><small>Llega con tu próximo pedido</small></div>
+    <span class="count b">7/10</span>
+  </div>
+</div></div>
+
+<!-- 2 · PRODUCTO -->
+<div class="wrap"><span class="label">2 · Armar el pedido: producto</span>
+<div class="phone">
+  <div class="status"><span class="num">9:42</span></div>
+  <div class="pd-nav">
+    <button class="icon-btn" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="icon-btn" aria-label="Guardar en favoritos"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></button>
+  </div>
+  <div class="pd-top">
+    <div class="arch"></div>
+    <img class="flora" src="img/cafe-rama.png" alt="">
+    <img class="hero" src="../public/nitro.svg" alt="Nitro Cold Brew">
+  </div>
+  <div class="pd">
+    <h1 class="b">Nitro Cold Brew</h1>
+    <p class="desc">Cold brew con nitrógeno, sin azúcar y con una crema aterciopelada.</p>
+    <div class="opt"><h5>Tamaño</h5>
+      <div class="seg"><button>Pequeño<small>12 oz</small></button><button class="on">Mediano<small>16 oz</small></button><button>Grande<small>20 oz</small></button></div>
+    </div>
+    <div class="opt"><h5>Leche</h5>
+      <div class="chips"><button class="on">Sin leche</button><button>Entera</button><button>Almendras</button><button>Avena</button></div>
+    </div>
+  </div>
+  <div class="foot"><button class="primary"><span>Agregar</span><span class="num">$31.000</span></button></div>
+</div></div>
+
+<!-- 3 · CARRITO -->
+<div class="wrap"><span class="label">3 · Armar el pedido: revisar</span>
+<div class="phone">
+  <div class="status"><span class="num">9:43</span></div>
+  <div class="top-title">
+    <button class="icon-btn" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="b">Tu pedido</h1>
+  </div>
+  <div class="pickup">
+    <div><small>Recoges en</small><b>Tienda Centro, en 6 min</b></div>
+    <button>Cambiar</button>
+  </div>
+  <div class="lines">
+    <div class="line"><div class="arch" style="background:var(--teal-s)"><img src="../public/nitro.svg" alt=""></div><div><b>Nitro Cold Brew</b><small>Mediano, sin leche</small><br><span class="num">$31.000</span></div><div class="qty"><button aria-label="Quitar uno"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="num">1</span><button aria-label="Agregar uno"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+    <div class="line"><div class="arch" style="background:var(--rosa-s)"><img src="../public/caramel_latte.svg" alt=""></div><div><b>Caramel Latte</b><small>Mediano, leche entera</small><br><span class="num">$25.200</span></div><div class="qty"><button aria-label="Quitar uno"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="num">1</span><button aria-label="Agregar uno"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+  </div>
+  <div class="prize">
+    <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
+    <div><b>Este pedido trae al Barranquero</b><small>Será tu ave 8 de 10. Te faltarían 2 para la bebida gratis.</small></div>
+  </div>
+  <div class="totals"><span>Total</span><span class="num">$56.200</span></div>
+  <div class="foot"><button class="primary"><span>Pagar y pedir</span><span class="num">$56.200</span></button></div>
+</div></div>
+
+<!-- 4 · ÁLBUM -->
+<div class="wrap"><span class="label">4 · Lealtad: álbum</span>
+<div class="phone" data-tab="Álbum">
+  <div class="status"><span class="num">9:41</span></div>
+  <div class="al-head">
+    <h1 class="b">Tu álbum</h1>
+    <p>Te faltan 3 aves para tu bebida gratis. La estampilla llega cuando recoges tu pedido.</p>
+    <div class="meter" aria-label="7 de 10 aves"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i></div>
+  </div>
+  <div class="grid">
+    <div class="slot"><div class="stamp"><div class="in"><img src="img/ave-tucan.png" alt=""></div></div><div class="nm">Tucán</div><div class="dt">3 de octubre, Tienda Centro</div></div>
+    <div class="slot"><div class="stamp" style="--c:var(--teal)"><div class="in"><img src="img/ave-toche.png" alt=""></div></div><div class="nm">Toche</div><div class="dt">29 de septiembre, Tienda Norte</div></div>
+    <div class="slot next"><div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div><div class="nm">Barranquero</div><div class="dt">Llega con tu próximo pedido</div></div>
+    <div class="slot locked"><div class="stamp"><div class="in"><img src="img/ave-carriqui.png" alt=""></div></div><div class="nm">Sin descubrir</div><div class="dt">Estampilla 9 de 10</div></div>
+  </div>
+</div></div>
+
+<!-- 5 · LISTO -->
+<div class="wrap"><span class="label">5 · Pedido listo</span>
+<div class="phone ready">
+  <div class="status"><span class="num">9:49</span></div>
+  <div class="txt">
+    <span class="tag"><i></i>Pedido <span class="num">1238</span></span>
+    <h1 class="b">Tu pedido está listo.</h1>
+    <p>Recógelo en la barra de la <b>Tienda Centro</b>.<br>Código: <b class="num">CQ-4471</b></p>
+  </div>
+  <img class="art" src="img/puerta-capibara.png" alt="">
+  <div class="ground"></div>
+  <div class="won">
+    <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
+    <div><b>Al recogerlo ganas al Barranquero</b><small>Ave 8 de 10 en tu álbum</small></div>
+  </div>
+  <div class="actions">
+    <button class="primary" style="justify-content:center">Ya lo recogí</button>
+    <button class="ghost">Ver recibo</button>
+  </div>
+</div></div>
+
+<script>
+  // Barra de estado y pestañas compartidas entre pantallas.
+  const sb = document.getElementById('sb').content;
+  document.querySelectorAll('.status').forEach(s => s.appendChild(sb.cloneNode(true)));
+  const tabs = document.getElementById('tabs').content;
+  document.querySelectorAll('.phone[data-tab]').forEach(p => {
+    const nav = tabs.cloneNode(true);
+    nav.querySelector(`[data-t="${p.dataset.tab}"]`).classList.add('on');
+    p.appendChild(nav);
+  });
+</script>
+</body>
+</html>
