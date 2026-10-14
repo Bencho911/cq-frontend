@@ -2,12 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { formatPickup, upcomingPickup } from '../../lib/pickup';
 
 interface TimePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (time: string) => void;
+  /** Fecha ISO de la franja elegida, o `null` para "lo antes posible". */
+  onConfirm: (time: string | null) => void;
+  /** Valor actual, para abrir la hoja con esa opción marcada. */
+  value?: string | null;
+  /** Minutos estimados de preparación para "lo antes posible". */
+  readyMinutes?: number;
 }
+
+const ASAP = 'asap';
 
 const SLOT_MINUTES = 15;
 /**
@@ -17,28 +25,25 @@ const SLOT_MINUTES = 15;
 const SLOT_COUNT = 12;
 const LEAD_MINUTES = 15;
 
-/** 9:15 a. m. */
-function formatTime(d: Date): string {
-  const h = d.getHours();
-  const m = d.getMinutes().toString().padStart(2, '0');
-  return `${h % 12 || 12}:${m} ${h < 12 ? 'a. m.' : 'p. m.'}`;
-}
-
 function buildSlots(now: Date): string[] {
   const start = new Date(now.getTime() + LEAD_MINUTES * 60_000);
   const rounded = Math.ceil(start.getMinutes() / SLOT_MINUTES) * SLOT_MINUTES;
   start.setMinutes(rounded, 0, 0);
-  return Array.from({ length: SLOT_COUNT }, (_, i) => formatTime(new Date(start.getTime() + i * SLOT_MINUTES * 60_000)));
+  return Array.from({ length: SLOT_COUNT }, (_, i) => new Date(start.getTime() + i * SLOT_MINUTES * 60_000).toISOString());
 }
 
 /** Hoja inferior para elegir la hora de recogida. */
-const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) => {
+const TimePickerModal = ({ isOpen, onClose, onConfirm, value = null, readyMinutes }: TimePickerModalProps) => {
   const slots = useMemo(() => (isOpen ? buildSlots(new Date()) : []), [isOpen]);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>(ASAP);
 
+  // Abre con la opción vigente marcada; si la hora guardada ya no está
+  // entre las franjas (pasó o es de otro día), vuelve a "lo antes posible".
   useEffect(() => {
-    if (isOpen) setSelected(null);
-  }, [isOpen]);
+    if (!isOpen) return;
+    const current = upcomingPickup(value);
+    setSelected(current && slots.includes(current) ? current : ASAP);
+  }, [isOpen, value, slots]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -48,8 +53,7 @@ const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) =
   }, [isOpen, onClose]);
 
   const handleConfirm = () => {
-    if (!selected) return;
-    onConfirm(selected);
+    onConfirm(selected === ASAP ? null : selected);
     onClose();
   };
 
@@ -83,7 +87,7 @@ const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) =
                 <h2 id="time-picker-title" className="font-display text-[26px] font-extrabold leading-tight text-ink">
                   ¿A qué hora lo recoges?
                 </h2>
-                <p className="mt-1 text-[15px] text-muted">Hoy. Tenemos tu pedido listo a esa hora.</p>
+                <p className="mt-1 text-[15px] text-muted">Hoy. Lo preparamos para que esté listo cuando llegues.</p>
               </div>
               <button
                 onClick={onClose}
@@ -95,6 +99,21 @@ const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) =
             </div>
 
             <div role="radiogroup" aria-label="Hora de recogida" className="mt-4 grid grid-cols-3 gap-2">
+              <button
+                role="radio"
+                aria-checked={selected === ASAP}
+                onClick={() => setSelected(ASAP)}
+                className={`col-span-3 flex min-h-[56px] items-center justify-between rounded-md border-[1.5px] px-4 text-left transition-colors duration-150 ${
+                  selected === ASAP ? 'border-ink bg-ink text-white' : 'border-line text-ink'
+                }`}
+              >
+                <span className="text-[16px] font-semibold">Lo antes posible</span>
+                {readyMinutes != null && (
+                  <span className={`text-[14px] ${selected === ASAP ? 'text-[#D7ECE9]' : 'text-muted'}`}>
+                    Listo en unos <span className="num">{readyMinutes}</span> min
+                  </span>
+                )}
+              </button>
               {slots.map((slot) => {
                 const active = selected === slot;
                 return (
@@ -107,7 +126,7 @@ const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) =
                       active ? 'border-ink bg-ink text-white' : 'border-line text-ink'
                     }`}
                   >
-                    {slot}
+                    {formatPickup(slot)}
                   </button>
                 );
               })}
@@ -115,10 +134,9 @@ const TimePickerModal = ({ isOpen, onClose, onConfirm }: TimePickerModalProps) =
 
             <button
               onClick={handleConfirm}
-              disabled={!selected}
-              className="mt-5 h-[54px] w-full rounded-md bg-ink text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97] disabled:opacity-45"
+              className="mt-5 h-[54px] w-full rounded-md bg-ink text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
             >
-              {selected ? `Recoger a las ${selected}` : 'Elige una hora'}
+              {selected === ASAP ? 'Recoger lo antes posible' : `Recoger a las ${formatPickup(selected)}`}
             </button>
           </motion.div>
         </div>

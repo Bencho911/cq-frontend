@@ -13,6 +13,7 @@ import { resolveImageUrl } from '../lib/image';
 import { toppingNames } from '../lib/customization';
 import { MOCK_ACCOUNT, POINTS_PER_REWARD, estimatePoints, preview, summarize } from '../lib/loyalty';
 import { MOCK_READY_MINUTES, storeShortName, useSelectedStore } from '../lib/session';
+import { formatPickup, upcomingPickup } from '../lib/pickup';
 import { Arch, archToneFor } from '../components/brand/Arch';
 import { Stamp } from '../components/brand/Stamp';
 
@@ -29,6 +30,7 @@ const Checkout = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const store = useSelectedStore();
+  const pickup = upcomingPickup(state.pickupTime);
 
   const handlePay = async () => {
     if (items.length === 0) return;
@@ -95,7 +97,7 @@ const Checkout = () => {
               <span className="block text-[16px] font-bold text-ink">
                 {store ? `Tienda ${storeShortName(store)}` : 'Elige una tienda'}
                 {state.deliveryType === 'recoger' && (
-                  <>, {state.pickupTime ? `a las ${state.pickupTime}` : `en ${MOCK_READY_MINUTES} min`}</>
+                  <>, {pickup ? `a las ${formatPickup(pickup)}` : `en ${MOCK_READY_MINUTES} min`}</>
                 )}
               </span>
             </div>
@@ -184,7 +186,7 @@ const Checkout = () => {
         {/* Horario y pago */}
         <div className="mt-4 px-5">
           {state.deliveryType === 'recoger' && (
-            <Row onClick={() => setIsTimePickerOpen(true)} label="Hora de recogida" value={state.pickupTime ?? 'Lo antes posible'} />
+            <Row onClick={() => setIsTimePickerOpen(true)} label="Hora de recogida" value={pickup ? formatPickup(pickup) : 'Lo antes posible'} />
           )}
           <Row
             onClick={() => navigate('/payment-method')}
@@ -217,6 +219,8 @@ const Checkout = () => {
         isOpen={isTimePickerOpen}
         onClose={() => setIsTimePickerOpen(false)}
         onConfirm={(time) => dispatch({ type: 'SET_PICKUP_TIME', pickupTime: time })}
+        value={pickup}
+        readyMinutes={MOCK_READY_MINUTES}
       />
     </div>
   );
