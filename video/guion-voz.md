@@ -1,5 +1,34 @@
 # Guion de voz · Promo Café Quindío (30 s)
 
+## Versión actual: una sola toma continua
+
+Se genera completo en una sola toma (misma voz, español, Eleven v3 o v4).
+Los saltos de línea dan las pausas; debe durar entre 27 y 30 s. Las escenas
+se ajustan a la voz, no al revés.
+
+```
+¿Antojo de un buen café del Quindío? Ahora lo tienes a un toque.
+Pídelo antes de llegar y recógelo en la barra, sin hacer fila.
+Grande, frío, con un espresso extra… como a ti te gusta.
+Y en cada pedido sumas puntos: cada diez, un ave nueva para tu álbum, y con cincuenta, el café va por nuestra cuenta.
+Cuando esté listo, te avisamos.
+Menú, pedidos y puntos, todo en una sola app.
+Café Quindío, el café del corazón de Colombia. Pide el tuyo desde la app.
+```
+
+## Música de fondo (ElevenLabs → Música)
+
+Instrumental, 30 s, para ir por debajo de la voz:
+
+```
+Warm, upbeat Colombian acoustic background music for a coffee app ad. Tiple and nylon guitar strumming, soft marimba melody, light hand percussion (shaker, cajón). Bright, friendly and relaxed, 100 BPM, major key. Instrumental only, no vocals. Leave space for a voiceover: simple, uncluttered arrangement. Clear ending on a final strum at 30 seconds.
+```
+
+---
+
+## Versión anterior (por bloques, descartada: se notaban los cortes)
+
+
 Medido para los tiempos del video (`src/Promo.tsx`). Ritmo objetivo: unas
 2,5 palabras por segundo, con silencios para que respiren los efectos.
 
