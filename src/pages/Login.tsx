@@ -1,31 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Clock, Gift, Store } from 'lucide-react';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthShell } from '../components/brand/AuthShell';
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, damping: 25, stiffness: 300 } },
-};
-
-const VALUE_PROPS = [
-  { icon: Clock, label: 'Pide sin filas' },
-  { icon: Gift, label: 'Acumula puntos' },
-  { icon: Store, label: 'Recoge en tienda' },
-];
+const PHONE_LENGTH = 10;
 
 const Login = () => {
   const navigate = useNavigate();
   const [telefono, setTelefono] = useState('');
 
-  const isValid = telefono.length >= 10;
+  const missing = PHONE_LENGTH - telefono.length;
+  const isValid = missing <= 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,97 +17,55 @@ const Login = () => {
   };
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-cream">
-      {/* ── Fondo completo: wallpaper de palmas ── */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url('/Artes corporativos/Fondos/fondos de color-Palmas.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'bottom center',
-        }}
-      />
-      {/* Overlay crema para legibilidad del formulario */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'rgba(245, 237, 216, 0.82)' }}
-      />
-
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="show"
-        className="relative z-10 flex flex-1 flex-col items-center justify-center overflow-y-auto px-5 pb-20 no-scrollbar"
-      >
-        {/* Logo con slogan */}
-        <motion.div variants={fadeUp} className="mb-8 flex flex-col items-center">
-          <img
-            src="/Artes corporativos/Logo-Slogan/Logos-Slogan-Café.png"
-            alt="Café Quindío"
-            className="w-[180px] object-contain"
-          />
-        </motion.div>
-
-        {/* ── Chips de propuesta de valor ── */}
-        <motion.div variants={fadeUp} className="mb-10 flex gap-3">
-          {VALUE_PROPS.map(({ icon: Icon, label }) => (
-            <div
-              key={label}
-              className="flex flex-col items-center gap-1.5 rounded-2xl px-3 py-3"
-              style={{
-                background: 'rgba(73, 180, 170, 0.10)',
-                border: '1px solid rgba(73, 180, 170, 0.22)',
-                minWidth: '88px',
-              }}
-            >
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ background: 'var(--color-brand-soft)' }}
-              >
-                <Icon size={16} style={{ color: 'var(--color-brand)' }} aria-hidden />
-              </div>
-              <span className="text-center text-[11px] font-semibold leading-tight text-ink">
-                {label}
-              </span>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Formulario */}
-        <motion.form
-          variants={fadeUp}
-          onSubmit={handleSubmit}
-          className="flex w-full max-w-[335px] flex-col gap-5"
-        >
-          <Input
-            label="No. teléfono móvil"
+    <AuthShell
+      tone="verde"
+      image="/brand/ventana-tucan.webp"
+      title="Entra con tu celular."
+      subtitle="Te pediremos tu PIN de 6 dígitos."
+    >
+      <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
+        <label htmlFor="login-phone" className="text-[14px] font-semibold text-ink">
+          Número de celular
+        </label>
+        <div className="mt-1.5 flex h-[52px] items-center rounded-md border-[1.5px] border-transparent bg-cream-deep focus-within:border-ink">
+          <span className="num border-r border-line px-3.5 text-[16px] text-ink">+57</span>
+          <input
+            id="login-phone"
             type="tel"
             inputMode="numeric"
+            autoComplete="tel-national"
             value={telefono}
-            onChange={(e) => setTelefono(e.target.value.replace(/\D/g, ''))}
-            placeholder="Ingresa tu número de teléfono"
+            onChange={(e) => setTelefono(e.target.value.replace(/\D/g, '').slice(0, PHONE_LENGTH))}
+            placeholder="300 000 0000"
+            aria-describedby="login-phone-hint"
+            className="num h-full flex-1 bg-transparent px-3.5 text-[16px] text-ink outline-none placeholder:text-muted-soft"
           />
-          <Button type="submit" disabled={!isValid} size="md" className="w-full">
-            Iniciar sesión
-          </Button>
-        </motion.form>
-      </motion.div>
+        </div>
+        <p id="login-phone-hint" className="mt-1.5 text-[13px] text-muted" aria-live="polite">
+          {telefono.length === 0
+            ? 'Sin espacios ni guiones.'
+            : isValid
+              ? 'Listo.'
+              : `Faltan ${missing} ${missing === 1 ? 'dígito' : 'dígitos'}.`}
+        </p>
 
-      {/* Link a registro */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="absolute bottom-8 left-0 z-10 flex w-full justify-center"
-      >
-        <span className="flex gap-1 text-[14px] font-medium text-muted">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="font-semibold text-brand">
-            Regístrate
-          </Link>
-        </span>
-      </motion.div>
-    </div>
+        <div className="mt-auto pb-[calc(env(safe-area-inset-bottom)+20px)] pt-6">
+          <button
+            type="submit"
+            disabled={!isValid}
+            className="h-[54px] w-full rounded-md bg-ink text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97] disabled:bg-cream-deep disabled:text-muted"
+          >
+            Continuar
+          </button>
+          <p className="mt-4 text-center text-[15px] text-muted">
+            ¿Primera vez?{' '}
+            <Link to="/register" className="inline-flex min-h-[44px] items-center font-semibold text-ink underline underline-offset-4">
+              Crea tu cuenta
+            </Link>
+          </p>
+        </div>
+      </form>
+    </AuthShell>
   );
 };
 

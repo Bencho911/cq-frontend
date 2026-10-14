@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import CoffeeLoader from '../components/ui/CoffeeLoader';
+import { WaitScreen } from '../components/brand/WaitScreen';
 
 const CheckoutLoading = () => {
   const navigate = useNavigate();
@@ -12,16 +11,12 @@ const CheckoutLoading = () => {
   }, [navigate]);
 
   return (
-    <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-cream px-5">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col items-center gap-6"
-      >
-        <CoffeeLoader />
-      </motion.div>
-    </div>
+    <WaitScreen
+      tone="verde"
+      image="/brand/ventana-ave.webp"
+      title="Enviando tu pedido."
+      description="La tienda lo recibe en un momento."
+    />
   );
 };
 

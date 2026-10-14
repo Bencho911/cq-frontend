@@ -6,7 +6,7 @@ import type { Category, Product, Store } from './types';
  */
 
 export const MOCK_CATEGORIES: Category[] = [
-  { cod_cat: 1, nom_cat: 'Coffee' },
+  { cod_cat: 1, nom_cat: 'Café' },
   { cod_cat: 2, nom_cat: 'Sin café' },
   { cod_cat: 3, nom_cat: 'Pastelería' },
 ];

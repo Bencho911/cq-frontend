@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Minus, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Check, ChevronLeft, Minus, Plus } from 'lucide-react';
 import type { Product } from '../../lib/types';
 import type { CartItem } from '../../lib/cart';
 import { discountedPrice, formatCOP } from '../../lib/format';
-import { Badge } from './Badge';
-import { Button } from './Button';
+import { resolveImageUrl } from '../../lib/image';
+import { Arch, archToneFor } from '../brand/Arch';
+import { TOPPINGS, toppingsPrice } from '../../lib/customization';
 
 interface ProductDetailSheetProps {
   product: Product | null;
@@ -16,17 +17,20 @@ interface ProductDetailSheetProps {
 }
 
 // MOCK: personalización de bebida (el backend no expone variantes/toppings aún).
-const TOPPINGS = [
-  { id: 'espresso', name: 'Espresso extra', price: 5000 },
-  { id: 'jelly', name: 'Coffee Jelly', price: 3000 },
-  { id: 'icecream', name: 'Helado de chocolate', price: 7000 },
-  { id: 'caramelo', name: 'Shot de caramelo', price: 2500 },
+const SIZES = [
+  { id: 'Pequeño', detail: '12 oz' },
+  { id: 'Mediano', detail: '16 oz' },
+  { id: 'Grande', detail: '20 oz' },
 ];
 
+/**
+ * Detalle de producto: armar el pedido. El arco de ventana colonial
+ * enmarca la foto; es la única pantalla, junto con el carrito, que lo usa.
+ */
 const ProductDetailSheet = ({ product, isOpen, onClose, onAddToCart }: ProductDetailSheetProps) => {
   const [quantity, setQuantity] = useState(1);
   const [variant, setVariant] = useState('Frío');
-  const [size, setSize] = useState('Regular');
+  const [size, setSize] = useState('Mediano');
   const [sugar, setSugar] = useState('Normal');
   const [ice, setIce] = useState('Normal');
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
@@ -36,7 +40,7 @@ const ProductDetailSheet = ({ product, isOpen, onClose, onAddToCart }: ProductDe
     if (isOpen) {
       setQuantity(1);
       setVariant('Frío');
-      setSize('Regular');
+      setSize('Mediano');
       setSugar('Normal');
       setIce('Normal');
       setSelectedToppings([]);
@@ -44,178 +48,180 @@ const ProductDetailSheet = ({ product, isOpen, onClose, onAddToCart }: ProductDe
     }
   }, [isOpen, product]);
 
-  const basePrice = product ? discountedPrice(product.precio_unitario, product.descuento) : 0;
-  const toppingsPrice = selectedToppings.reduce((acc, id) => {
-    const topping = TOPPINGS.find((t) => t.id === id);
-    return acc + (topping?.price || 0);
-  }, 0);
-  const totalPrice = (basePrice + toppingsPrice) * quantity;
-
-  const toggleTopping = (id: string) =>
-    setSelectedToppings((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]));
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !product) return null;
 
+  const basePrice = discountedPrice(product.precio_unitario, product.descuento);
+  const totalPrice = (basePrice + toppingsPrice(selectedToppings)) * quantity;
+  const toggleTopping = (id: string) =>
+    setSelectedToppings((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]));
+
   const handleAdd = () => {
-    onAddToCart({
-      product,
-      quantity,
-      size,
-      variant,
-      sugar,
-      ice,
-      toppings: selectedToppings,
-      notes,
-    });
+    onAddToCart({ product, quantity, size, variant, sugar, ice, toppings: selectedToppings, notes });
     onClose();
   };
 
-  const sheet = (
-    <AnimatePresence>
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-        className="fixed inset-0 z-[9999] mx-auto flex w-full max-w-[400px] flex-col overflow-hidden bg-cream"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Personalizar ${product.nom_prod}`}
-      >
-        <div className="flex items-center gap-2 bg-surface px-2 py-3">
-          <button onClick={onClose} aria-label="Cerrar" className="flex h-10 w-10 items-center justify-center text-ink">
-            <ArrowLeft size={24} aria-hidden />
+  return createPortal(
+    <motion.div
+      initial={{ transform: 'translateY(100%)' }}
+      animate={{ transform: 'translateY(0%)' }}
+      transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+      className="fixed inset-0 z-[9999] mx-auto flex w-full max-w-[400px] flex-col overflow-hidden bg-white"
+      role="dialog"
+      aria-modal="true"
+      aria-label={product.nom_prod}
+    >
+      <div className="no-scrollbar flex-1 overflow-y-auto overscroll-contain pb-[110px]">
+        {/* ── Arco con la foto ── */}
+        <div className="relative h-[340px] pt-[max(env(safe-area-inset-top),12px)]">
+          <button
+            onClick={onClose}
+            aria-label="Volver"
+            className="absolute left-3 top-[max(env(safe-area-inset-top),12px)] z-10 grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow-soft"
+          >
+            <ChevronLeft size={24} aria-hidden />
           </button>
-          <h1 className="text-[16px] font-semibold text-ink">Personalizar pedido</h1>
+          <Arch tone={archToneFor(product.cod_prod)} className="absolute inset-x-8 bottom-0 top-14">
+            {product.url_imagen ? (
+              <img
+                src={resolveImageUrl(product.url_imagen)}
+                alt=""
+                className="mb-2 h-[210px] w-auto object-contain"
+              />
+            ) : (
+              <span className="mb-16 text-[14px] text-muted">Sin imagen</span>
+            )}
+          </Arch>
+          <img src="/brand/cafe-rama.webp" alt="" aria-hidden className="absolute bottom-[-6px] left-2 w-[110px]" />
         </div>
 
-        <div className="no-scrollbar flex-1 overflow-y-auto pb-[96px]">
-          <div className="relative flex h-[260px] w-full items-center justify-center bg-cream-deep">
-            <div
-              className="absolute h-[170px] w-[170px] rounded-full"
-              style={{ background: 'radial-gradient(50% 50% at 50% 50%, #e3b184 0%, rgba(227,177,132,0) 100%)' }}
-            />
-            {product.url_imagen ? (
-              <img src={product.url_imagen} alt={product.nom_prod} className="z-10 h-[220px] w-[150px] object-contain drop-shadow-card" />
-            ) : (
-              <div className="z-10 text-muted-soft">Sin imagen</div>
-            )}
+        <div className="px-5 pt-5">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="font-display text-[30px] font-extrabold leading-none text-ink">{product.nom_prod}</h1>
+            {product.descuento ? (
+              <span className="mt-1 shrink-0 rounded-sm bg-mostaza px-2 py-0.5 text-[13px] font-bold text-ink">-{product.descuento}%</span>
+            ) : null}
           </div>
+          <p className="mt-2 text-[16px] leading-relaxed text-muted">{product.desc_prod}</p>
 
-          <div className="flex flex-col gap-4 px-5 pb-8 pt-4">
-            <div className="relative z-20 -mt-10 mx-1 flex flex-col gap-1 rounded-2xl bg-surface p-4 shadow-card">
-              <Badge tone="accent" className="w-fit">{product.categoria?.nom_cat ?? 'Bebida'}</Badge>
-
-              <div className="mt-1 flex items-center justify-between">
-                <h2 className="text-[18px] font-semibold text-ink">{product.nom_prod}</h2>
-                <span className="text-[18px] font-semibold text-ink">{formatCOP(basePrice)}</span>
-              </div>
-
-              <div className="flex items-start justify-between">
-                <p className="max-w-[200px] text-[14px] leading-[20px] text-muted">{product.desc_prod}</p>
-
-                <div className="flex h-[30px] items-center overflow-hidden rounded-lg border border-line bg-surface">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Disminuir" className="flex h-full w-[30px] items-center justify-center bg-cream-deep text-brand">
-                    <Minus size={15} aria-hidden />
-                  </button>
-                  <span className="w-[30px] text-center text-[14px] font-bold text-ink">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} aria-label="Aumentar" className="flex h-full w-[30px] items-center justify-center bg-cream-deep text-brand">
-                    <Plus size={15} aria-hidden />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-
-
-            <div className="flex flex-col gap-3 rounded-2xl border border-line p-4">
-              <h3 className="text-[14px] font-semibold text-ink">Personalizar</h3>
-              <Row label="Variante">
-                <SelectionButton active={variant === 'Frío'} onClick={() => setVariant('Frío')} label="Frío" />
-                <SelectionButton active={variant === 'Caliente'} onClick={() => setVariant('Caliente')} label="Caliente" />
-              </Row>
-              <Row label="Tamaño">
-                <SelectionButton active={size === 'Regular'} onClick={() => setSize('Regular')} label="Regular" />
-                <SelectionButton active={size === 'Medio'} onClick={() => setSize('Medio')} label="Medio" />
-                <SelectionButton active={size === 'Grande'} onClick={() => setSize('Grande')} label="Grande" />
-              </Row>
-              <Row label="Azúcar">
-                <SelectionButton active={sugar === 'Normal'} onClick={() => setSugar('Normal')} label="Normal" />
-                <SelectionButton active={sugar === 'Sin'} onClick={() => setSugar('Sin')} label="Sin" />
-              </Row>
-              <Row label="Hielo">
-                <SelectionButton active={ice === 'Normal'} onClick={() => setIce('Normal')} label="Normal" />
-                <SelectionButton active={ice === 'Sin'} onClick={() => setIce('Sin')} label="Sin" />
-              </Row>
-            </div>
-
-            <div className="flex flex-col gap-3 rounded-2xl border border-line p-4">
-              <h3 className="text-[14px] font-semibold text-ink">Topping</h3>
-              {TOPPINGS.map((topping) => (
-                <label key={topping.id} className="flex cursor-pointer items-center justify-between py-1">
-                  <span className="text-[14px] text-ink">{topping.name}</span>
-                  <span className="flex items-center gap-3">
-                    <span className="text-[14px] font-medium text-muted-strong">+ {formatCOP(topping.price)}</span>
-                    <div className={`flex h-[20px] w-[20px] items-center justify-center rounded-[6px] border-2 transition-colors ${
-                      selectedToppings.includes(topping.id) ? 'border-ink bg-ink' : 'border-muted-soft'
-                    }`}>
-                      {selectedToppings.includes(topping.id) && (
-                        <svg width="11" height="8" viewBox="0 0 12 10" fill="none">
-                          <path d="M1.5 5.5L4.5 8.5L10.5 1.5" stroke="#fffdf9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </div>
-                    <input type="checkbox" className="hidden" checked={selectedToppings.includes(topping.id)} onChange={() => toggleTopping(topping.id)} />
-                  </span>
-                </label>
+          <Group title="Tamaño">
+            <div className="grid grid-cols-3 gap-1.5">
+              {SIZES.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSize(s.id)}
+                  aria-pressed={size === s.id}
+                  className={`h-[54px] rounded-md border-[1.5px] text-[15px] font-semibold leading-tight transition-colors ${
+                    size === s.id ? 'border-ink bg-ink text-white' : 'border-line text-ink'
+                  }`}
+                >
+                  {s.id}
+                  <span className={`block text-[12px] font-normal ${size === s.id ? 'text-[#BFD0D6]' : 'text-muted'}`}>{s.detail}</span>
+                </button>
               ))}
             </div>
+          </Group>
 
-            <div className="flex flex-col gap-2">
-              <h3 className="text-[14px] font-semibold text-ink">Notas</h3>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Opcional"
-                className="h-[100px] w-full resize-none rounded-2xl border border-line bg-surface p-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
-              />
+          <Group title="Temperatura">
+            <Chips options={['Frío', 'Caliente']} value={variant} onChange={setVariant} />
+          </Group>
+          <Group title="Azúcar">
+            <Chips options={['Normal', 'Poca', 'Sin azúcar']} value={sugar} onChange={setSugar} />
+          </Group>
+          <Group title="Hielo">
+            <Chips options={['Normal', 'Poco', 'Sin hielo']} value={ice} onChange={setIce} />
+          </Group>
+
+          <Group title="Adiciones">
+            <div className="flex flex-col">
+              {TOPPINGS.map((t) => {
+                const on = selectedToppings.includes(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => toggleTopping(t.id)}
+                    role="checkbox"
+                    aria-checked={on}
+                    className="flex min-h-[48px] items-center justify-between border-b border-line text-left"
+                  >
+                    <span className="text-[16px] text-ink">{t.name}</span>
+                    <span className="flex items-center gap-3">
+                      <span className="num text-[15px] text-muted">+{formatCOP(t.price)}</span>
+                      <span className={`grid h-6 w-6 place-items-center rounded-sm border-[1.5px] ${on ? 'border-ink bg-ink text-white' : 'border-muted-soft'}`}>
+                        {on && <Check size={15} strokeWidth={3} aria-hidden />}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </div>
-        </div>
+          </Group>
 
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-surface px-5 py-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-2px_10px_rgba(74,44,28,0.06)]">
-          <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-muted">Total</span>
-            <span className="text-[18px] font-bold text-ink">{formatCOP(totalPrice)}</span>
-          </div>
-          <Button onClick={handleAdd}>Agregar</Button>
+          <Group title="Notas para la barra">
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Opcional"
+              className="h-[88px] w-full resize-none rounded-md border border-line bg-cream-deep p-3 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-ink"
+            />
+          </Group>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+
+      {/* ── Acción ── */}
+      <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 border-t border-line bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+14px)] pt-3">
+        <div className="flex h-[54px] items-center rounded-md border-[1.5px] border-line">
+          <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Quitar uno" className="grid h-full w-11 place-items-center text-ink">
+            <Minus size={18} aria-hidden />
+          </button>
+          <span className="num w-6 text-center text-[16px] text-ink" aria-live="polite">{quantity}</span>
+          <button onClick={() => setQuantity(quantity + 1)} aria-label="Agregar uno" className="grid h-full w-11 place-items-center text-ink">
+            <Plus size={18} aria-hidden />
+          </button>
+        </div>
+        <button
+          onClick={handleAdd}
+          className="flex h-[54px] flex-1 items-center justify-between rounded-md bg-ink px-4 text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
+        >
+          Agregar <span className="num">{formatCOP(totalPrice)}</span>
+        </button>
+      </div>
+    </motion.div>,
+    document.body,
   );
-
-  return createPortal(sheet, document.body);
 };
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-[14px] text-ink">{label}</span>
-      <div className="flex gap-2">{children}</div>
-    </div>
+    <section className="mt-5">
+      <h2 className="mb-2 text-[15px] font-semibold text-ink">{title}</h2>
+      {children}
+    </section>
   );
 }
 
-function SelectionButton({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function Chips({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
   return (
-    <button
-      onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
-        active ? 'border-brand bg-brand text-cream' : 'border-brand text-brand'
-      }`}
-    >
-      {label}
-    </button>
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          aria-pressed={value === o}
+          className={`h-11 rounded-md border-[1.5px] px-4 text-[15px] transition-colors ${
+            value === o ? 'border-ink font-bold text-ink' : 'border-line text-ink'
+          }`}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
   );
 }
 

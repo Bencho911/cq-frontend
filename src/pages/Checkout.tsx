@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, MapPin, Minus, Plus, Store, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Minus, Plus, Store, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCart, useCartTotals, toOrderLines } from '../lib/cart';
+import { itemUnitPrice, lineKey, useCart, useCartTotals, toOrderLines, type CartItem } from '../lib/cart';
 import { orderService } from '../lib/orderService';
 import { formatCOP } from '../lib/format';
 import { USE_MOCKS } from '../lib/env';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import TimePickerModal from '../components/ui/TimePickerModal';
+import { resolveImageUrl } from '../lib/image';
+import { toppingNames } from '../lib/customization';
+import { MOCK_ACCOUNT, POINTS_PER_REWARD, estimatePoints, preview, summarize } from '../lib/loyalty';
+import { MOCK_READY_MINUTES, storeShortName, useSelectedStore } from '../lib/session';
+import { formatPickup, upcomingPickup } from '../lib/pickup';
+import { Arch, archToneFor } from '../components/brand/Arch';
+import { Stamp } from '../components/brand/Stamp';
 
 const PAYMENT_LABELS: Record<string, string> = {
   wompi: 'Tarjeta (Wompi)',
@@ -22,6 +29,8 @@ const Checkout = () => {
   const { count, subtotal, items } = useCartTotals();
   const [submitting, setSubmitting] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const store = useSelectedStore();
+  const pickup = upcomingPickup(state.pickupTime);
 
   const handlePay = async () => {
     if (items.length === 0) return;
@@ -56,224 +65,213 @@ const Checkout = () => {
   if (items.length === 0) {
     return (
       <div className="flex min-h-[100dvh] flex-col bg-cream">
-        <Header onBack={() => navigate('/home')} title="Checkout" />
+        <Header onBack={() => navigate('/home')} />
         <EmptyState
           icon={Store}
-          title="Tu carrito está vacío"
-          description="Agrega productos desde el menú para continuar."
-          action={<Button onClick={() => navigate('/menu')}>Ir al menú</Button>}
+          title="Tu pedido está vacío"
+          description="Elige algo del menú para empezar."
+          action={<Button onClick={() => navigate('/menu')}>Ver el menú</Button>}
         />
       </div>
     );
   }
 
+  const earned = estimatePoints(subtotal);
+  const reward = preview(MOCK_ACCOUNT, earned);
+  const prizeBird = reward.newBirds.at(-1) ?? null;
+
   return (
     <div className="flex min-h-[100dvh] flex-col bg-cream">
-      <Header onBack={() => navigate(-1)} title="Checkout" />
+      <Header onBack={() => navigate(-1)} />
 
       <div className="flex-1 pb-36">
-        {/* Items */}
-        <div className="flex flex-col gap-3 px-5 py-4">
-          {items.map((item) => (
-            <div key={item.product.cod_prod} className="flex items-start gap-3 rounded-3xl bg-surface p-3 shadow-soft">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-cream-deep">
-                {item.product.url_imagen ? (
-                  <img src={item.product.url_imagen} alt={item.product.nom_prod} className="h-full w-full object-contain" />
-                ) : (
-                  <Store size={20} className="text-muted-soft" aria-hidden />
-                )}
-              </div>
-
-              <div className="flex flex-1 flex-col gap-1">
-                <div className="flex items-start justify-between">
-                  <h3 className="text-[14px] font-semibold text-ink">{item.product.nom_prod}</h3>
-                  <button
-                    onClick={() => dispatch({ type: 'REMOVE', codProd: item.product.cod_prod })}
-                    aria-label={`Quitar ${item.product.nom_prod}`}
-                    className="text-muted-soft transition-colors hover:text-danger"
-                  >
-                    <Trash2 size={17} aria-hidden />
-                  </button>
-                </div>
-                <p className="text-[12px] leading-[18px] text-muted">
-                  {[item.variant, item.size, item.sugar !== 'Normal' ? item.sugar : null, item.ice !== 'Normal' ? item.ice : null]
-                    .filter(Boolean)
-                    .join(' · ') || 'Estándar'}
-                </p>
-                <div className="mt-1 flex items-center justify-between">
-                  <div className="flex h-7 items-center overflow-hidden rounded-lg border border-line">
-                    <button
-                      onClick={() => dispatch({ type: 'SET_QTY', codProd: item.product.cod_prod, quantity: item.quantity - 1 })}
-                      aria-label="Disminuir"
-                      className="flex h-full w-7 items-center justify-center bg-cream-deep text-brand"
-                    >
-                      <Minus size={13} aria-hidden />
-                    </button>
-                    <span className="w-7 text-center text-[13px] font-semibold text-ink">{item.quantity}</span>
-                    <button
-                      onClick={() => dispatch({ type: 'SET_QTY', codProd: item.product.cod_prod, quantity: item.quantity + 1 })}
-                      aria-label="Aumentar"
-                      className="flex h-full w-7 items-center justify-center bg-cream-deep text-brand"
-                    >
-                      <Plus size={13} aria-hidden />
-                    </button>
-                  </div>
-                  <span className="text-[14px] font-bold text-ink">
-                    {formatCOP(item.quantity * item.product.precio_unitario)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button onClick={() => navigate('/menu')} className="ml-5 flex items-center gap-1 text-[14px] font-semibold text-accent-deep">
-          <Plus size={16} aria-hidden /> Agregar más
-        </button>
-
-        {/* Entrega */}
-        <SectionTitle title="¿Cómo quieres recibir tu pedido?" />
-        <div className="px-5">
-          <div className="flex gap-2">
+        {/* Recogida */}
+        <div className="mx-5 mt-2 rounded-md bg-teal-soft p-1">
+          <div className="grid grid-cols-2 gap-1" role="group" aria-label="Tipo de entrega">
             <DeliveryChip active={state.deliveryType === 'recoger'} onClick={() => dispatch({ type: 'SET_DELIVERY', deliveryType: 'recoger' })} label="Recoger en tienda" />
             <DeliveryChip active={state.deliveryType === 'domicilio'} onClick={() => dispatch({ type: 'SET_DELIVERY', deliveryType: 'domicilio' })} label="Domicilio" />
           </div>
-
-          <div className="mt-2 flex flex-col">
-            <Row onClick={() => navigate('/stores')}>
-              <span className="flex items-center gap-2 text-[14px] font-medium text-ink">
-                <MapPin size={17} className="text-accent-deep" aria-hidden />
-                Tienda
+          <div className="flex items-center justify-between px-3 py-2.5">
+            <div>
+              <span className="block text-[13px] text-muted">{state.deliveryType === 'recoger' ? 'Recoges en' : 'Prepara la tienda'}</span>
+              <span className="block text-[16px] font-bold text-ink">
+                {store ? `Tienda ${storeShortName(store)}` : 'Elige una tienda'}
+                {state.deliveryType === 'recoger' && (
+                  <>, {pickup ? `a las ${formatPickup(pickup)}` : `en ${MOCK_READY_MINUTES} min`}</>
+                )}
               </span>
-              <span className="flex items-center gap-1 text-[13px] text-muted">
-                {state.storeId ? `Tienda #${state.storeId}` : 'Elegir tienda'}
-                <ChevronRight size={16} aria-hidden />
-              </span>
-            </Row>
-
-            <Row onClick={() => setIsTimePickerOpen(true)}>
-              <span className="text-[14px] font-medium text-ink">Horario de recogida</span>
-              <span className="text-[13px] text-muted">
-                {state.pickupTime ?? 'Lo antes posible'}
-              </span>
-            </Row>
-
-            {/* Formulario de dirección de domicilio */}
-            {state.deliveryType === 'domicilio' && (
-              <div className="mt-3 flex flex-col gap-2.5">
-                <div className="flex flex-col gap-1">
-                  <label htmlFor="delivery-address" className="text-[12px] font-semibold text-muted-strong">Dirección de entrega</label>
-                  <input
-                    id="delivery-address"
-                    type="text"
-                    placeholder="Ej. Calle 12 #9-34"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label htmlFor="delivery-apt" className="text-[12px] font-semibold text-muted-strong">Apartamento / Piso (opcional)</label>
-                  <input
-                    id="delivery-apt"
-                    type="text"
-                    placeholder="Ej. Apto 301"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label htmlFor="delivery-refs" className="text-[12px] font-semibold text-muted-strong">Referencias</label>
-                  <input
-                    id="delivery-refs"
-                    type="text"
-                    placeholder="Ej. Casa de color azul, portón blanco"
-                    className="h-11 w-full rounded-xl border border-line bg-surface px-4 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-accent"
-                  />
-                </div>
-              </div>
-            )}
+            </div>
+            <button onClick={() => navigate('/stores')} className="min-h-[44px] text-[15px] font-semibold text-ink underline underline-offset-4">
+              Cambiar
+            </button>
           </div>
         </div>
 
+        {/* Líneas: el arco solo aparece al armar el pedido */}
+        <ul className="px-5 pt-2">
+          {items.map((item) => (
+            <li key={lineKey(item)} className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-line py-3.5">
+              <Arch tone={archToneFor(item.product.cod_prod)} className="h-[68px] w-14">
+                {item.product.url_imagen && (
+                  <img src={resolveImageUrl(item.product.url_imagen)} alt="" className="mb-0.5 w-[46px] object-contain" />
+                )}
+              </Arch>
+              <div className="min-w-0">
+                <span className="block text-[16px] font-bold text-ink">{item.product.nom_prod}</span>
+                <span className="block text-[14px] leading-snug text-muted">{describe(item) || 'Como viene'}</span>
+                <span className="num mt-0.5 block text-[15px] text-ink">{formatCOP(item.quantity * itemUnitPrice(item))}</span>
+              </div>
+              <div className="flex h-11 items-center rounded-md border-[1.5px] border-line">
+                <button
+                  onClick={() =>
+                    item.quantity === 1
+                      ? dispatch({ type: 'REMOVE', key: lineKey(item) })
+                      : dispatch({ type: 'SET_QTY', key: lineKey(item), quantity: item.quantity - 1 })
+                  }
+                  aria-label={item.quantity === 1 ? `Quitar ${item.product.nom_prod}` : 'Quitar uno'}
+                  className="grid h-full w-10 place-items-center text-ink"
+                >
+                  {item.quantity === 1 ? <Trash2 size={16} aria-hidden /> : <Minus size={16} aria-hidden />}
+                </button>
+                <span className="num w-5 text-center text-[15px] text-ink">{item.quantity}</span>
+                <button
+                  onClick={() => dispatch({ type: 'SET_QTY', key: lineKey(item), quantity: item.quantity + 1 })}
+                  aria-label="Agregar uno"
+                  className="grid h-full w-10 place-items-center text-ink"
+                >
+                  <Plus size={16} aria-hidden />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-        {/* Pago */}
-        <SectionTitle title="Pago" />
-        <div className="px-5">
-          <Row onClick={() => navigate('/payment-method')}>
-            <span className="text-[14px] font-medium text-ink">Método de pago</span>
-            <span className="flex items-center gap-1 text-[13px] text-muted">
-              {state.paymentMethod ? PAYMENT_LABELS[state.paymentMethod] ?? state.paymentMethod : 'Seleccionar'}
-              <ChevronRight size={16} aria-hidden />
-            </span>
-          </Row>
+        <button onClick={() => navigate('/menu')} className="ml-5 mt-1 flex h-12 items-center gap-1.5 text-[15px] font-semibold text-ink">
+          <Plus size={17} aria-hidden /> Agregar algo más
+        </button>
 
-          <div className="mt-3 flex flex-col gap-1 rounded-2xl border border-line p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] text-muted">Subtotal ({count} {count === 1 ? 'ítem' : 'ítems'})</span>
-              <span className="text-[13px] text-muted">{formatCOP(subtotal)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-semibold text-ink">Total</span>
-              <span className="text-[16px] font-bold text-ink">{formatCOP(subtotal)}</span>
+        {/* Puntos que suma el pedido */}
+        {earned > 0 && (
+          <div className="mx-5 mt-2 grid grid-cols-[64px_1fr] items-center gap-3.5">
+            <Stamp
+              bird={prizeBird ?? summarize(MOCK_ACCOUNT).nextBird ?? summarize(MOCK_ACCOUNT).slots[0].bird}
+              state={prizeBird ? 'earned' : 'next'}
+              className="h-[78px] w-16"
+            />
+            <div>
+              <span className="block text-[16px] font-bold text-ink">
+                Este pedido suma <span className="num">{earned}</span> {earned === 1 ? 'punto' : 'puntos'}
+              </span>
+              <span className="block text-[14px] leading-snug text-muted">
+                {reward.completesCard
+                  ? `Completas la tarjeta: ganas ${prizeBird ? `al ${prizeBird.name} y ` : ''}una bebida gratis.`
+                  : prizeBird
+                    ? `Llegas a ${reward.total} y ganas al ${prizeBird.name}.`
+                    : `Llegas a ${reward.total} de ${POINTS_PER_REWARD}.`}
+              </span>
             </div>
           </div>
+        )}
 
-          {USE_MOCKS && (
-            <div className="mt-3">
+        {/* Entrega a domicilio */}
+        {state.deliveryType === 'domicilio' && (
+          <div className="mt-5 flex flex-col gap-2.5 px-5">
+            <h2 className="text-[15px] font-semibold text-ink">Dirección de entrega</h2>
+            <Field id="delivery-address" label="Dirección" placeholder="Ej. Calle 12 #9-34" />
+            <Field id="delivery-apt" label="Apartamento o piso (opcional)" placeholder="Ej. Apto 301" />
+            <Field id="delivery-refs" label="Referencias" placeholder="Ej. Casa azul, portón blanco" />
+          </div>
+        )}
 
-            </div>
+        {/* Horario y pago */}
+        <div className="mt-4 px-5">
+          {state.deliveryType === 'recoger' && (
+            <Row onClick={() => setIsTimePickerOpen(true)} label="Hora de recogida" value={pickup ? formatPickup(pickup) : 'Lo antes posible'} />
           )}
+          <Row
+            onClick={() => navigate('/payment-method')}
+            label="Método de pago"
+            value={state.paymentMethod ? PAYMENT_LABELS[state.paymentMethod] ?? state.paymentMethod : 'Elegir'}
+          />
+          <div className="flex items-center justify-between pt-4">
+            <span className="text-[16px] text-ink">
+              Total (<span className="num">{count}</span> {count === 1 ? 'producto' : 'productos'})
+            </span>
+            <span className="num text-[20px] text-ink">{formatCOP(subtotal)}</span>
+          </div>
         </div>
       </div>
 
       {/* Acción fija inferior */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[400px] border-t border-line bg-surface px-5 py-3 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-muted">Total</span>
-            <span className="text-[18px] font-bold text-ink">{formatCOP(subtotal)}</span>
-          </div>
-          <Button onClick={handlePay} loading={submitting}>
-            Pagar
-          </Button>
-        </div>
+      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[400px] border-t border-line bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+14px)] pt-3">
+        <button
+          onClick={handlePay}
+          disabled={submitting}
+          aria-busy={submitting || undefined}
+          className="flex h-[54px] w-full items-center justify-between rounded-md bg-ink px-4 text-[17px] font-semibold text-white transition-transform duration-150 active:scale-[0.97] disabled:opacity-60"
+        >
+          {submitting ? 'Enviando pedido…' : 'Pagar y pedir'}
+          <span className="num">{formatCOP(subtotal)}</span>
+        </button>
       </div>
 
       <TimePickerModal
         isOpen={isTimePickerOpen}
         onClose={() => setIsTimePickerOpen(false)}
         onConfirm={(time) => dispatch({ type: 'SET_PICKUP_TIME', pickupTime: time })}
+        value={pickup}
+        readyMinutes={MOCK_READY_MINUTES}
       />
     </div>
   );
 };
 
-function Header({ onBack, title }: { onBack: () => void; title: string }) {
+function describe(item: CartItem): string {
+  return [
+    item.size,
+    item.variant?.toLowerCase(),
+    item.sugar && item.sugar !== 'Normal' ? item.sugar.toLowerCase() : null,
+    item.ice && item.ice !== 'Normal' ? item.ice.toLowerCase() : null,
+    ...toppingNames(item.toppings).map((n) => `+ ${n.toLowerCase()}`),
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function Header({ onBack }: { onBack: () => void }) {
   return (
-    <div className="sticky top-0 z-40 flex items-center gap-1 border-b border-line bg-cream/90 px-2 py-3 backdrop-blur-xl">
-      <button onClick={onBack} aria-label="Volver" className="flex h-10 w-10 items-center justify-center text-ink">
-        <ArrowLeft size={24} aria-hidden />
+    <div className="sticky top-0 z-40 flex items-center gap-1 bg-white/95 px-2 pb-2 pt-[max(env(safe-area-inset-top),12px)] backdrop-blur-xl">
+      <button onClick={onBack} aria-label="Volver" className="grid h-11 w-11 place-items-center text-ink">
+        <ChevronLeft size={26} aria-hidden />
       </button>
-      <img
-        src="/Artes corporativos/Logo-Slogan/Logos-Slogan-Café.png"
-        alt={title}
-        className="w-28 object-contain"
-      />
+      <h1 className="font-display text-[26px] font-extrabold text-ink">Tu pedido</h1>
     </div>
   );
 }
 
-function SectionTitle({ title }: { title: string }) {
-  return <h2 className="px-5 pb-2 pt-5 text-[14px] font-semibold text-ink">{title}</h2>;
+function Row({ onClick, label, value }: { onClick: () => void; label: string; value: string }) {
+  return (
+    <button onClick={onClick} className="flex min-h-[52px] w-full items-center justify-between border-b border-line text-left">
+      <span className="text-[16px] text-ink">{label}</span>
+      <span className="flex items-center gap-1 text-[15px] text-muted">
+        {value}
+        <ChevronRight size={17} aria-hidden />
+      </span>
+    </button>
+  );
 }
 
-function Row({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
-  const Comp = onClick ? 'button' : 'div';
+function Field({ id, label, placeholder }: { id: string; label: string; placeholder: string }) {
   return (
-    <Comp
-      onClick={onClick}
-      className="flex w-full items-center justify-between border-b border-line py-3 text-left"
-    >
-      {children}
-    </Comp>
+    <div className="flex flex-col gap-1">
+      <label htmlFor={id} className="text-[14px] font-semibold text-ink">{label}</label>
+      <input
+        id={id}
+        type="text"
+        placeholder={placeholder}
+        className="h-12 w-full rounded-md border border-line bg-cream-deep px-4 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-ink"
+      />
+    </div>
   );
 }
 
@@ -282,8 +280,8 @@ function DeliveryChip({ active, onClick, label }: { active: boolean; onClick: ()
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`flex-1 rounded-2xl border px-3 py-3 text-[13px] font-semibold transition-colors ${
-        active ? 'border-brand bg-brand text-cream' : 'border-line bg-surface text-muted-strong'
+      className={`h-11 rounded-md text-[15px] font-semibold transition-colors ${
+        active ? 'bg-white text-ink shadow-xs' : 'text-muted'
       }`}
     >
       {label}

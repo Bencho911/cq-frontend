@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import type { OrderLine, Product } from './types';
+import { discountedPrice } from './format';
+import { toppingsPrice } from './customization';
 
 export interface CartItem {
   product: Product;
@@ -26,8 +28,8 @@ interface CartState {
 
 type CartAction =
   | { type: 'ADD'; item: CartItem }
-  | { type: 'REMOVE'; codProd: number }
-  | { type: 'SET_QTY'; codProd: number; quantity: number }
+  | { type: 'REMOVE'; key: string }
+  | { type: 'SET_QTY'; key: string; quantity: number }
   | { type: 'CLEAR' }
   | { type: 'SET_STORE'; storeId: number }
   | { type: 'SET_DELIVERY'; deliveryType: DeliveryType }
@@ -35,6 +37,19 @@ type CartAction =
   | { type: 'SET_PAYMENT_METHOD'; paymentMethod: string | null };
 
 const STORAGE_KEY = 'cq-cart-v1';
+
+/** Identidad de una línea: producto más su personalización. */
+export function lineKey(item: CartItem): string {
+  return [
+    item.product.cod_prod,
+    item.size ?? '',
+    item.variant ?? '',
+    item.sugar ?? '',
+    item.ice ?? '',
+    [...(item.toppings ?? [])].sort().join('+'),
+    item.notes?.trim() ?? '',
+  ].join('|');
+}
 
 const initialState: CartState = {
   items: [],
@@ -47,27 +62,24 @@ const initialState: CartState = {
 function reducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD': {
-      const existing = state.items.find((i) => i.product.cod_prod === action.item.product.cod_prod);
+      // Solo se suman líneas idénticas: un Nitro mediano y uno grande con
+      // espresso extra son dos líneas distintas.
+      const key = lineKey(action.item);
+      const existing = state.items.find((i) => lineKey(i) === key);
       if (existing) {
         return {
           ...state,
-          items: state.items.map((i) =>
-            i.product.cod_prod === action.item.product.cod_prod
-              ? { ...i, quantity: i.quantity + action.item.quantity }
-              : i,
-          ),
+          items: state.items.map((i) => (lineKey(i) === key ? { ...i, quantity: i.quantity + action.item.quantity } : i)),
         };
       }
       return { ...state, items: [...state.items, action.item] };
     }
     case 'REMOVE':
-      return { ...state, items: state.items.filter((i) => i.product.cod_prod !== action.codProd) };
+      return { ...state, items: state.items.filter((i) => lineKey(i) !== action.key) };
     case 'SET_QTY':
       return {
         ...state,
-        items: state.items.map((i) =>
-          i.product.cod_prod === action.codProd ? { ...i, quantity: Math.max(1, action.quantity) } : i,
-        ),
+        items: state.items.map((i) => (lineKey(i) === action.key ? { ...i, quantity: Math.max(1, action.quantity) } : i)),
       };
     case 'CLEAR':
       return { ...state, items: [] };
@@ -124,11 +136,20 @@ export function useCart() {
 export function useCartTotals() {
   const { state } = useCart();
   const count = state.items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal = state.items.reduce(
-    (sum, i) => sum + i.quantity * i.product.precio_unitario,
-    0,
-  );
+  // Con descuento aplicado: antes el carrito sumaba el precio de lista
+  // aunque las tarjetas mostraban el precio rebajado.
+  const subtotal = state.items.reduce((sum, i) => sum + i.quantity * itemUnitPrice(i), 0);
   return { count, subtotal, items: state.items };
+}
+
+/** Precio unitario que paga el cliente (con descuento). */
+export function unitPrice(product: Product): number {
+  return discountedPrice(product.precio_unitario, product.descuento);
+}
+
+/** Precio unitario de una línea: producto con descuento más adiciones. */
+export function itemUnitPrice(item: CartItem): number {
+  return unitPrice(item.product) + toppingsPrice(item.toppings);
 }
 
 /** Convierte el carrito a líneas de orden (contrato del backend). */
@@ -136,7 +157,9 @@ export function toOrderLines(items: CartItem[]): OrderLine[] {
   return items.map((i) => ({
     cod_prod: i.product.cod_prod,
     cantidad: i.quantity,
-    precio_unit: i.product.precio_unitario,
+    // Precio con descuento, el mismo que vio el cliente. Confirmar con el
+    // backend si espera precio de lista y aplica el descuento por su cuenta.
+    precio_unit: itemUnitPrice(i),
     nom_prod: i.product.nom_prod,
     url_imagen: i.product.url_imagen,
   }));

@@ -1,242 +1,215 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Coffee,
-  FileText,
-  RotateCcw,
-  ShoppingBag,
-} from 'lucide-react';
+import { ChevronRight, RotateCcw } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/EmptyState';
+import { PageHeader } from '../components/brand/PageHeader';
+import { Segmented } from '../components/brand/Segmented';
 import { formatCOP } from '../lib/format';
+import { useReorder } from '../lib/reorder';
 
 type OrderStatus = 'pendiente' | 'preparando' | 'listo' | 'completada' | 'cancelada';
+
+interface MockOrderItem {
+  codProd?: number;
+  name: string;
+  size?: string;
+  quantity: number;
+  unitPrice: number;
+}
 
 interface MockOrder {
   id: number;
   status: OrderStatus;
-  items: string[];
+  items: MockOrderItem[];
   total: number;
   store: string;
   date: string;
   paymentMethod: string;
+  discount: number;
 }
 
-const STATUS_CONFIG: Record<OrderStatus, { label: string; tone: 'success' | 'warning' | 'danger' | 'neutral' | 'accent'; icon: typeof CheckCircle2 }> = {
-  pendiente: { label: 'Pendiente', tone: 'warning', icon: Clock },
-  preparando: { label: 'Preparando', tone: 'accent', icon: Coffee },
-  listo: { label: 'Listo para recoger', tone: 'success', icon: CheckCircle2 },
-  completada: { label: 'Completado', tone: 'success', icon: CheckCircle2 },
-  cancelada: { label: 'Cancelado', tone: 'danger', icon: ShoppingBag },
+const STATUS_CONFIG: Record<OrderStatus, { label: string; tone: 'accent' | 'brand' | 'neutral' | 'danger' | 'warning' }> = {
+  pendiente: { label: 'Recibido', tone: 'warning' },
+  preparando: { label: 'Preparando', tone: 'accent' },
+  listo: { label: 'Listo', tone: 'brand' },
+  completada: { label: 'Entregado', tone: 'neutral' },
+  cancelada: { label: 'Cancelado', tone: 'danger' },
 };
 
+const order = (o: Omit<MockOrder, 'total' | 'discount'>): MockOrder => ({
+  ...o,
+  discount: 0,
+  total: o.items.reduce((s, i) => s + i.quantity * i.unitPrice, 0),
+});
+
+// MOCK: pedidos de ejemplo hasta que el backend exponga el historial del usuario.
 const MOCK_ACTIVE: MockOrder[] = [
-  {
+  order({
     id: 1238,
     status: 'preparando',
-    items: ['Nitro Cold Brew', 'Caramel Latte'],
-    total: 64000,
+    items: [
+      { codProd: 3, name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
+      { codProd: 5, name: 'Caramel Latte', quantity: 1, unitPrice: 33000 },
+    ],
     store: 'Café Quindío · Centro',
-    date: 'Hoy 2:15 PM',
+    date: 'Hoy, 2:15 p. m.',
     paymentMethod: 'Tarjeta (Wompi)',
-  },
+  }),
 ];
 
+// MOCK
 const MOCK_HISTORY: MockOrder[] = [
-  {
+  order({
     id: 1237,
     status: 'completada',
-    items: ['Café con leche', 'Caffè Mocha', 'Croissant'],
-    total: 82000,
+    items: [
+      { codProd: 1, name: 'Café con leche', quantity: 1, unitPrice: 25000 },
+      { codProd: 4, name: 'Caffè Mocha', quantity: 1, unitPrice: 29000 },
+      { name: 'Croissant', quantity: 1, unitPrice: 28000 },
+    ],
     store: 'Café Quindío · Norte',
-    date: 'Ayer 10:30 AM',
-    paymentMethod: 'Efectivo',
-  },
-  {
+    date: 'Ayer, 10:30 a. m.',
+    paymentMethod: 'Efectivo en tienda',
+  }),
+  order({
     id: 1236,
     status: 'completada',
-    items: ['Cocoa Caramel Latte'],
-    total: 33000,
+    items: [{ codProd: 2, name: 'Cocoa Caramel Latte', quantity: 1, unitPrice: 33000 }],
     store: 'Café Quindío · Centro',
-    date: '08 Sep, 3:45 PM',
+    date: '8 sep, 3:45 p. m.',
     paymentMethod: 'Tarjeta (Wompi)',
-  },
-  {
+  }),
+  order({
     id: 1235,
     status: 'completada',
-    items: ['Caramel Latte', 'Nitro Cold Brew'],
-    total: 59000,
+    items: [
+      { codProd: 5, name: 'Caramel Latte', quantity: 1, unitPrice: 28000 },
+      { codProd: 3, name: 'Nitro Cold Brew', quantity: 1, unitPrice: 31000 },
+    ],
     store: 'Café Quindío · Aeropuerto',
-    date: '05 Sep, 9:00 AM',
+    date: '5 sep, 9:00 a. m.',
     paymentMethod: 'Pago en kiosco',
-  },
-  {
+  }),
+  order({
     id: 1234,
     status: 'cancelada',
-    items: ['Café con leche'],
-    total: 25000,
+    items: [{ codProd: 1, name: 'Café con leche', quantity: 1, unitPrice: 25000 }],
     store: 'Café Quindío · Centro',
-    date: '02 Sep, 11:20 AM',
+    date: '2 sep, 11:20 a. m.',
     paymentMethod: 'Tarjeta (Wompi)',
-  },
+  }),
 ];
 
-const OrderCard = ({ order, onViewDetails, onReorder }: { order: MockOrder; onViewDetails: () => void; onReorder: () => void }) => {
+const shortStore = (name: string) => `Tienda ${name.replace(/^Café Quindío\s*[·-]\s*/i, '')}`;
+
+function OrderRow({ order, onOpen, onReorder, busy }: { order: MockOrder; onOpen: () => void; onReorder?: () => void; busy?: boolean }) {
   const status = STATUS_CONFIG[order.status];
-  const StatusIcon = status.icon;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" as any }}
-      className="rounded-2xl bg-surface p-4"
-      style={{ boxShadow: 'var(--shadow-soft)' }}
-    >
-      {/* Encabezado */}
-      <div className="mb-3 flex items-start justify-between">
-        <div>
-          <p className="text-[12px] font-medium text-muted">Pedido #{order.id}</p>
-          <p className="mt-0.5 text-[13px] text-muted-soft">{order.date}</p>
-        </div>
-        <Badge tone={status.tone}>
-          <StatusIcon size={11} aria-hidden />
-          {status.label}
-        </Badge>
-      </div>
-
-      {/* Ítems */}
-      <div className="mb-3 flex flex-col gap-0.5">
-        {order.items.map((item, i) => (
-          <p key={i} className="text-[14px] font-medium text-ink">
-            {i > 0 && '+ '}{item}
-          </p>
-        ))}
-      </div>
-
-      {/* Separador */}
-      <div className="mb-3 h-px bg-line" />
-
-      {/* Footer */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[13px] text-muted">{order.store}</p>
-          <p className="text-[15px] font-bold text-ink">{formatCOP(order.total)}</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={onViewDetails}
-            aria-label="Ver detalles del pedido"
-            className="flex items-center gap-1 rounded-xl border border-line bg-cream-deep px-3 py-2 text-[12px] font-semibold text-muted-strong transition-colors hover:bg-line"
-          >
-            <FileText size={13} aria-hidden />
-            Recibo
-          </button>
-          {order.status === 'completada' && (
-            <button
-              onClick={onReorder}
-              aria-label="Volver a pedir"
-              className="flex items-center gap-1 rounded-xl bg-brand px-3 py-2 text-[12px] font-semibold text-cream"
-            >
-              <RotateCcw size={13} aria-hidden />
-              Pedir de nuevo
-            </button>
-          )}
-        </div>
-      </div>
-    </motion.div>
+    <li className="border-b border-line">
+      <button onClick={onOpen} className="flex w-full items-start gap-3 pb-3 pt-4 text-left">
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
+            <span className="text-[16px] font-bold text-ink">
+              Pedido <span className="num">{order.id}</span>
+            </span>
+            <Badge tone={status.tone}>{status.label}</Badge>
+          </span>
+          <span className="mt-0.5 block text-[14px] text-muted">
+            {order.date}, {shortStore(order.store)}
+          </span>
+          <span className="mt-1 block text-[15px] leading-snug text-ink">
+            {order.items.map((i) => i.name).join(', ')}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1 pt-0.5">
+          <span className={`num text-[16px] ${order.status === 'cancelada' ? 'text-muted line-through' : 'text-ink'}`}>
+            {formatCOP(order.total)}
+          </span>
+          <ChevronRight size={18} className="text-muted" aria-hidden />
+        </span>
+      </button>
+      {onReorder && (
+        <button
+          onClick={onReorder}
+          disabled={busy}
+          aria-busy={busy || undefined}
+          className="mb-4 flex h-11 items-center gap-2 rounded-md border-[1.5px] border-ink px-4 text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.97] disabled:opacity-60"
+        >
+          <RotateCcw size={16} aria-hidden />
+          {order.status === 'cancelada' ? 'Volver a pedir' : 'Repetir pedido'}
+        </button>
+      )}
+    </li>
   );
-};
+}
 
 const Orders = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'activos' | 'historial'>('activos');
+  const { reorder, busy } = useReorder();
+  const list = activeTab === 'activos' ? MOCK_ACTIVE : MOCK_HISTORY;
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-cream pb-24">
-      <div className="sticky top-0 z-[20] border-b border-line bg-cream/90 px-5 py-4 backdrop-blur-xl">
-        <h1 className="font-display text-[22px] font-semibold text-ink">Mis pedidos</h1>
+    <div className="flex min-h-[100dvh] flex-col bg-cream pb-28">
+      <PageHeader title="Pedidos" />
+
+      <div className="px-5 pt-2">
+        <Segmented
+          label="Tipo de pedidos"
+          value={activeTab}
+          onChange={setActiveTab}
+          options={[
+            {
+              value: 'activos',
+              label: (
+                <>
+                  En curso
+                  {MOCK_ACTIVE.length > 0 && (
+                    <span className="num ml-1.5 text-muted">{MOCK_ACTIVE.length}</span>
+                  )}
+                </>
+              ),
+            },
+            { value: 'historial', label: 'Historial' },
+          ]}
+        />
       </div>
 
-      {/* Tabs */}
-      <div className="px-5 pt-4">
-        <div className="flex rounded-xl bg-cream-deep p-1">
-          {(['activos', 'historial'] as const).map((tab) => (
+      {list.length === 0 ? (
+        <EmptyState
+          image="/brand/ave-colibri-rosa.webp"
+          title={activeTab === 'activos' ? 'No tienes pedidos en curso' : 'Aún no tienes pedidos'}
+          description={
+            activeTab === 'activos'
+              ? 'Cuando hagas un pedido, aquí verás cómo va.'
+              : 'Tus pedidos anteriores aparecerán aquí para repetirlos rápido.'
+          }
+          action={
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className="relative flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-[14px] font-semibold transition-colors"
+              onClick={() => navigate('/menu')}
+              className="h-12 rounded-md bg-ink px-6 text-[16px] font-semibold text-white transition-transform duration-150 active:scale-[0.97]"
             >
-              {activeTab === tab && (
-                <motion.div
-                  layoutId="tab-bg"
-                  className="absolute inset-0 rounded-lg bg-surface"
-                  style={{ boxShadow: 'var(--shadow-soft)' }}
-                />
-              )}
-              <span className={`relative z-10 capitalize ${activeTab === tab ? 'text-ink' : 'text-muted-soft'}`}>
-                {tab === 'activos' ? 'En proceso' : 'Historial'}
-              </span>
-              {tab === 'activos' && MOCK_ACTIVE.length > 0 && (
-                <span className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-[10px] font-bold text-cream">
-                  {MOCK_ACTIVE.length}
-                </span>
-              )}
+              Ver el menú
             </button>
+          }
+        />
+      ) : (
+        <ul className="px-5 pt-1">
+          {list.map((o) => (
+            <OrderRow
+              key={o.id}
+              order={o}
+              onOpen={() => navigate(`/invoice/${o.id}`, { state: { order: o } })}
+              busy={busy}
+              onReorder={
+                o.status === 'completada' || o.status === 'cancelada'
+                  ? () => reorder(o.items.map((i) => ({ codProd: i.codProd, name: i.name, quantity: i.quantity, size: i.size })))
+                  : undefined
+              }
+            />
           ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3 px-5 pt-4">
-        <AnimatePresence mode="wait">
-          {activeTab === 'activos' ? (
-            MOCK_ACTIVE.length === 0 ? (
-              <EmptyState
-                key="empty-active"
-                icon={ShoppingBag}
-                title="Sin pedidos activos"
-                description="Cuando hagas un pedido, aparecerá aquí su estado en tiempo real."
-              />
-            ) : (
-              <motion.div key="active-list" className="flex flex-col gap-3">
-                {MOCK_ACTIVE.map((order) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    onViewDetails={() => navigate('/invoice/demo', { state: { order } })}
-                    onReorder={() => navigate('/menu')}
-                  />
-                ))}
-              </motion.div>
-            )
-          ) : (
-            <motion.div key="history-list" className="flex flex-col gap-3">
-              {MOCK_HISTORY.map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  onViewDetails={() => navigate('/invoice/demo', { state: { order } })}
-                  onReorder={() => navigate('/menu')}
-                />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Ver más */}
-      {activeTab === 'historial' && (
-        <div className="px-5 pt-4">
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-3 text-[14px] font-semibold text-muted-strong">
-            <ChevronRight size={16} aria-hidden />
-            Cargar más pedidos
-          </button>
-        </div>
+        </ul>
       )}
     </div>
   );

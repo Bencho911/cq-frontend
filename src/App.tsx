@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import Layout from './components/layout/Layout';
 import SplashScreen from './components/layout/SplashScreen';
-import LiquidTransition from './components/ui/LiquidTransition';
 
 // Auth / Onboarding
 import Onboarding from './pages/Onboarding';
@@ -38,17 +37,18 @@ import RatingReview from './pages/RatingReview';
 import PaymentMethod from './pages/PaymentMethod';
 import Vouchers from './pages/Vouchers';
 
+// Solo un fundido corto de entrada. Sin animación de salida: con
+// `mode="wait"` cada navegación esperaba ~480 ms antes de mostrar la
+// siguiente pantalla, y las pestañas se tocan decenas de veces al día.
 const pageVariants: Variants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.28, ease: "easeOut" as any } },
-  exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeOut" as any } },
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.15, ease: [0.23, 1, 0.32, 1] } },
 };
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (
   <motion.div
     initial="initial"
     animate="animate"
-    exit="exit"
     variants={pageVariants}
     className="w-full"
   >
@@ -58,18 +58,12 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => (
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [showLiquid, setShowLiquid] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    const t1 = setTimeout(() => setShowLiquid(true), 2000);
-    const t2 = setTimeout(() => setShowSplash(false), 2800);
-    const t3 = setTimeout(() => setShowLiquid(false), 4000);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
+    // Antes: splash + transición líquida = 4 s antes de poder usar la app.
+    const t = setTimeout(() => setShowSplash(false), 700);
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -77,12 +71,8 @@ function App() {
       <AnimatePresence>
         {showSplash && <SplashScreen key="splash" />}
       </AnimatePresence>
-      <AnimatePresence>
-        {showLiquid && <LiquidTransition key="liquid" />}
-      </AnimatePresence>
 
       <Layout>
-        <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             {/* Redirect root */}
             <Route path="/" element={<Navigate to="/onboarding" replace />} />
@@ -117,10 +107,10 @@ function App() {
             <Route path="/rating-review" element={<PageWrapper><RatingReview /></PageWrapper>} />
             <Route path="/payment-method" element={<PageWrapper><PaymentMethod /></PageWrapper>} />
             <Route path="/vouchers" element={<PageWrapper><Vouchers /></PageWrapper>} />
-            <Route path="/loyalty" element={<PageWrapper><LoyaltyProgram /></PageWrapper>} />
+            <Route path="/album" element={<PageWrapper><LoyaltyProgram /></PageWrapper>} />
+            <Route path="/loyalty" element={<Navigate to="/album" replace />} />
             <Route path="/privacy" element={<PageWrapper><PrivacySecurity /></PageWrapper>} />
           </Routes>
-        </AnimatePresence>
       </Layout>
     </>
   );

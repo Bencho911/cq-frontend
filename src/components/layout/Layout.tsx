@@ -6,14 +6,14 @@ interface LayoutProps {
 }
 
 /** Rutas principales con barra de navegación inferior. */
-const TAB_PATHS = ['/home', '/menu', '/orders', '/profile'];
+const TAB_PATHS = ['/home', '/menu', '/album', '/orders', '/profile'];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const showBottomNav = TAB_PATHS.includes(location.pathname);
 
   return (
-    <div className="min-h-[100dvh] bg-cream-deep sm:bg-cream">
+    <div className="min-h-[100dvh] bg-cream-deep">
       <div className="mx-auto flex min-h-[100dvh] w-full flex-col bg-cream sm:max-w-[400px] sm:shadow-lift">
         <main className="relative z-0 flex-1 overflow-x-hidden">{children}</main>
         {showBottomNav && <BottomNav />}

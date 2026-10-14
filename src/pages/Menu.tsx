@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag } from 'lucide-react';
 import { productService } from '../lib/productService';
 import type { Category, Product } from '../lib/types';
@@ -17,6 +17,7 @@ const ALL = 'Todos';
 
 const Menu = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { dispatch } = useCart();
   const { count, subtotal } = useCartTotals();
 
@@ -24,7 +25,10 @@ const Menu = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(ALL);
+  // Las puertas de Inicio abren el menú ya filtrado por su categoría.
+  const [activeCategory, setActiveCategory] = useState<string>(
+    (location.state as { category?: string } | null)?.category ?? ALL,
+  );
   const [query, setQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -67,20 +71,15 @@ const Menu = () => {
     <div className="flex min-h-[100dvh] flex-col pb-28">
       <div className="sticky top-0 z-40 border-b border-line bg-cream/90 px-5 pb-3 pt-5 backdrop-blur-xl">
         <div className="mb-3 flex items-center justify-between">
-          {/* Logo real en lugar de texto plano */}
-          <img
-            src="/Artes corporativos/Logo-Slogan/Logos-Slogan-Café.png"
-            alt="Menú Café Quindío"
-            className="w-32 object-contain"
-          />
+          <h1 className="font-display text-[28px] font-extrabold text-ink">Menú</h1>
           <button
             onClick={() => navigate('/checkout')}
             aria-label="Ver carrito"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-surface text-ink shadow-soft"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full bg-cream-deep text-ink"
           >
             <ShoppingBag size={20} aria-hidden />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold text-cream">
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-mostaza px-1 text-[12px] font-bold text-ink">
                 {count}
               </span>
             )}
@@ -94,7 +93,7 @@ const Menu = () => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="¿Qué se te antoja hoy?"
             aria-label="Buscar en el menú"
-            className="h-11 w-full rounded-2xl border border-line bg-surface pl-4 pr-11 text-[14px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
+            className="h-11 w-full rounded-md border border-line bg-cream-deep pl-4 pr-11 text-[16px] text-ink outline-none placeholder:text-muted-soft focus:border-brand"
           />
           <Search size={18} className="pointer-events-none absolute inset-y-0 right-4 my-auto text-muted-soft" aria-hidden />
         </div>
@@ -102,11 +101,11 @@ const Menu = () => {
         <CategoryTabs categories={categoryNames} activeCategory={activeCategory} onSelect={setActiveCategory} />
       </div>
 
-      <div className="mt-3 flex flex-col gap-3 px-4">
+      <div className="flex flex-col px-5">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 rounded-3xl bg-surface p-3">
-              <Skeleton className="h-[88px] w-[88px] rounded-2xl" />
+            <div key={i} className="flex items-center gap-3 border-b border-line py-3">
+              <Skeleton className="h-16 w-16 rounded-full" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-2/3" />
                 <Skeleton className="h-3 w-full" />
@@ -119,13 +118,13 @@ const Menu = () => {
         ) : displayedProducts.length === 0 ? (
           <EmptyState icon={Search} title="Sin resultados" description="Prueba con otra categoría o búsqueda." />
         ) : (
-          displayedProducts.map((product, index) => (
+          displayedProducts.map((product) => (
+            // "+" abre el detalle: tamaño y leche se eligen antes de agregar.
             <ProductCard
               key={product.cod_prod}
               product={product}
-              index={index}
               onClick={setSelectedProduct}
-              onAdd={(p) => dispatch({ type: 'ADD', item: { product: p, quantity: 1 } })}
+              onAdd={setSelectedProduct}
             />
           ))
         )}
@@ -141,18 +140,18 @@ const Menu = () => {
       <AnimatePresence>
         {count > 0 && (
           <motion.button
-            initial={{ opacity: 0, y: 60 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 60 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => navigate('/checkout')}
-            className="fixed bottom-[88px] left-0 right-0 z-50 mx-auto flex w-[calc(100%-40px)] max-w-[360px] items-center justify-between rounded-2xl bg-brand p-4 text-cream shadow-lift"
+            className="fixed bottom-[80px] left-0 right-0 z-50 mx-auto flex h-14 w-[calc(100%-40px)] max-w-[360px] items-center justify-between rounded-md bg-mostaza px-4 text-ink shadow-lift"
           >
-            <span className="flex items-center gap-3">
+            <span className="flex items-center gap-2.5 text-[16px] font-bold">
               <ShoppingBag size={20} aria-hidden />
-              <span className="text-[14px] font-bold">{count} {count === 1 ? 'ítem' : 'ítems'}</span>
+              Ver pedido (<span className="num">{count}</span>)
             </span>
-            <span className="text-[16px] font-bold">{formatCOP(subtotal)}</span>
+            <span className="num text-[16px] font-semibold">{formatCOP(subtotal)}</span>
           </motion.button>
         )}
       </AnimatePresence>

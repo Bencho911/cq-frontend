@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dirección 1 · Ventana colonial</title>
+<style>
+/*
+  DIRECCIÓN 1 — VENTANA COLONIAL
+  Forma de marca: el arco de las ventanas de Salento y Filandia, tomado de las
+  composiciones corporativas. Solo se usa en las fotos de producto; todo lo
+  demás es recto y tranquilo. Una sola familia: Neutra Text (fuente oficial).
+  Color: teal profundo como superficie de autoridad, tintas de la ilustración
+  (mostaza, rosa) solo como fondos de los arcos.
+*/
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Book.otf); font-weight: 400; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Demi.otf); font-weight: 600; }
+@font-face { font-family: Neutra; src: url(fonts/NeutraText-Bold.otf); font-weight: 700; }
+@font-face { font-family: NeutraTF; src: url(fonts/NeutraTextTF-Demi.otf); font-weight: 600; }
+
+:root {
+  --teal-900: #123B37;   /* superficie de cabecera */
+  --teal-700: #1F5E57;   /* acción: 7.4:1 con blanco */
+  --teal-100: #DDEEEC;   /* fondo de arco */
+  --mostaza-100: #F8E7B6;
+  --rosa-100: #F8DCE5;
+  --tinta: #12302D;      /* texto: teal casi negro, no gris neutro */
+  --tinta-2: #4A5F5C;    /* secundario: 6.4:1 sobre blanco */
+  --linea: #E2E8E6;
+  --papel: #FFFFFF;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #D9DDDC; font-family: Neutra, system-ui, sans-serif; color: var(--tinta);
+  display: flex; gap: 48px; justify-content: center; align-items: flex-start; padding: 40px; flex-wrap: wrap; }
+.phone { width: 390px; height: 844px; background: var(--papel); position: relative; overflow: hidden;
+  border-radius: 44px; box-shadow: 0 30px 60px rgba(18,48,45,.18); }
+.status { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px;
+  font: 600 16px/1 NeutraTF, Neutra; position: relative; z-index: 3; }
+.status.light { color: #fff; }
+.sb-icons { display: flex; gap: 6px; align-items: center; }
+.scroll { position: absolute; inset: 0; overflow: hidden; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:active { transform: scale(0.97); transition: transform 120ms var(--ease-out); }
+.num { font-family: NeutraTF, Neutra; font-weight: 600; }
+
+/* ── Cabecera: la tienda es el titular ── */
+.head { background: var(--teal-900); color: #fff; padding: 0 20px 64px; position: relative; overflow: hidden; }
+.head .art { position: absolute; right: -40px; top: 96px; width: 200px; opacity: .95; pointer-events: none; }
+.head .top { display: flex; justify-content: space-between; align-items: center; height: 56px; position: relative; }
+.head .logo { height: 26px; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 22px; }
+.head .icon-btn { margin-right: -10px; }
+.pickup { position: relative; margin-top: 18px; max-width: 220px; }
+.pickup small { font-size: 14px; color: #A9CFCA; }
+.pickup h1 { font-size: 30px; font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-top: 4px; }
+.pickup p { font-size: 14px; color: #CFE3E0; margin-top: 8px; line-height: 1.4; }
+.pickup .change { margin-top: 14px; height: 36px; padding: 0 14px; border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.35); font-size: 14px; font-weight: 600; color: #fff; }
+
+/* ── Lo de siempre: superpuesta a la cabecera ── */
+.again { margin: -40px 16px 0; position: relative; background: #fff; border-radius: 16px; padding: 16px;
+  box-shadow: 0 1px 0 var(--linea), 0 8px 24px rgba(18,48,45,.10); display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.thumbs { display: flex; }
+.thumbs span { width: 48px; height: 56px; border-radius: 24px 24px 8px 8px; display: grid; place-items: center; overflow: hidden; }
+.thumbs span + span { margin-left: -12px; box-shadow: -2px 0 0 #fff; }
+.thumbs img { width: 44px; }
+.again h2 { font-size: 16px; font-weight: 700; }
+.again p { font-size: 14px; color: var(--tinta-2); margin-top: 2px; }
+.again .cta { grid-column: 1 / -1; height: 48px; border-radius: 12px; background: var(--teal-700); color: #fff;
+  font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; }
+
+/* ── Grilla de arcos ── */
+.section { padding: 28px 16px 0; }
+.section h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.section .sub { font-size: 14px; color: var(--tinta-2); margin-top: 2px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 12px; margin-top: 16px; }
+.arch { height: 168px; border-radius: 999px 999px 10px 10px; display: grid; place-items: end center; overflow: hidden; position: relative; }
+.arch img { width: 108px; margin-bottom: 6px; }
+.item h4 { font-size: 16px; font-weight: 600; margin-top: 10px; line-height: 1.2; }
+.item .row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.item .price { font-size: 16px; }
+.add { width: 44px; height: 44px; margin-right: -6px; border-radius: 22px; display: grid; place-items: center; color: var(--teal-700); }
+.add i { width: 32px; height: 32px; border-radius: 16px; border: 1.5px solid var(--teal-700); display: grid; place-items: center; }
+.t { background: var(--teal-100); } .m { background: var(--mostaza-100); } .r { background: var(--rosa-100); }
+
+/* ── Barra inferior ── */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: rgba(255,255,255,.94);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--linea);
+  display: flex; justify-content: space-around; padding-top: 8px; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; color: var(--tinta-2); width: 72px; }
+.tab.on { color: var(--teal-700); font-weight: 700; }
+
+/* ── Pantalla de producto ── */
+.pd-top { height: 380px; position: relative; display: grid; place-items: end center; }
+.pd-arch { position: absolute; left: 32px; right: 32px; top: 64px; bottom: 0; border-radius: 999px 999px 0 0; }
+.pd-top .hero { position: relative; width: 190px; margin-bottom: 12px; }
+.pd-top .flora { position: absolute; width: 130px; left: 8px; bottom: -6px; }
+.pd-nav { position: absolute; top: 54px; left: 12px; right: 12px; display: flex; justify-content: space-between; z-index: 2; }
+.pd-nav .icon-btn { background: #fff; box-shadow: 0 1px 4px rgba(18,48,45,.12); }
+.pd { padding: 22px 20px 0; }
+.pd h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.pd .desc { font-size: 16px; color: var(--tinta-2); margin-top: 8px; line-height: 1.45; }
+.opt { margin-top: 22px; }
+.opt h5 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--linea); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button { height: 52px; border-radius: 8px; font-size: 15px; font-weight: 600; line-height: 1.15; }
+.seg button small { display: block; font-size: 12px; font-weight: 400; color: var(--tinta-2); }
+.seg .on { background: var(--teal-700); color: #fff; } .seg .on small { color: #CFE3E0; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips button { height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--linea); font-size: 15px; }
+.chips .on { border: 1.5px solid var(--teal-700); color: var(--teal-700); font-weight: 600; background: var(--teal-100); }
+.buy { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 30px; background: #fff; border-top: 1px solid var(--linea); }
+.buy button { width: 100%; height: 54px; border-radius: 12px; background: var(--teal-700); color: #fff; font-size: 17px; font-weight: 600;
+  display: flex; justify-content: space-between; align-items: center; padding: 0 18px; }
+.caption { width: 100%; text-align: center; font: 400 15px Neutra; color: #4A5F5C; }
+.caption b { color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<p class="caption"><b>Dirección 1 · Ventana colonial.</b> El arco de las ventanas de la marca enmarca cada producto. La tienda es el titular.</p>
+
+<!-- ═════════════ PANTALLA 1 · INICIO ═════════════ -->
+<div class="phone">
+  <div class="scroll">
+    <div class="head">
+      <div class="status light"><span class="num">9:41</span><span class="sb-icons"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"/><rect x="24" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".4"/></svg></span></div>
+      <img class="art" src="img/ventana-ave.png" alt="">
+      <div class="top">
+        <img class="logo" src="img/logo-blanco.png" alt="Café Quindío">
+      </div>
+      <div class="pickup">
+        <small>Recoges en</small>
+        <h1>Tienda Centro</h1>
+        <p>Calle 12 #9-34, Armenia.<br>Tu pedido estaría listo en <b class="num">6 min</b>.</p>
+        <button class="change">Cambiar tienda</button>
+      </div>
+    </div>
+
+    <div class="again">
+      <div class="thumbs">
+        <span class="m"><img src="../public/nitro.svg" alt=""></span>
+        <span class="r"><img src="../public/caramel_latte.svg" alt=""></span>
+      </div>
+      <div>
+        <h2>Lo de siempre</h2>
+        <p>Nitro Cold Brew y Caramel Latte</p>
+      </div>
+      <button class="cta"><span>Pedir de nuevo</span><span class="num">$56.200</span></button>
+    </div>
+
+    <div class="section">
+      <h3>Para esta tarde</h3>
+      <div class="grid">
+        <div class="item">
+          <div class="arch t"><img src="../public/cafeconleche.svg" alt=""></div>
+          <h4>Café con leche</h4>
+          <div class="row"><span class="price num">$25.000</span><button class="add" aria-label="Agregar Café con leche"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i></button></div>
+        </div>
+        <div class="item">
+          <div class="arch m"><img src="../public/macha.svg" alt=""></div>
+          <h4>Caffè Mocha</h4>
+          <div class="row"><span class="price num">$29.000</span><button class="add" aria-label="Agregar Caffè Mocha"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabbar">
+    <div class="tab on"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4zM6 2v2M10 2v2M14 2v2"/></svg>Menú</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/></svg>Pedidos</div>
+    <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Cuenta</div>
+  </nav>
+</div>
+
+<!-- ═════════════ PANTALLA 2 · PRODUCTO ═════════════ -->
+<div class="phone">
+  <div class="status"><span class="num">9:41</span><span class="sb-icons"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"/><rect x="24" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".4"/></svg></span></div>
+  <div class="pd-nav">
+    <button class="icon-btn" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="icon-btn" aria-label="Guardar en favoritos"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></button>
+  </div>
+  <div class="pd-top">
+    <div class="pd-arch m"></div>
+    <img class="flora" src="img/cafe-rama.png" alt="">
+    <img class="hero" src="../public/nitro.svg" alt="Nitro Cold Brew">
+  </div>
+  <div class="pd">
+    <h1>Nitro Cold Brew</h1>
+    <p class="desc">Cold brew con nitrógeno, sin azúcar y con una crema aterciopelada.</p>
+    <div class="opt">
+      <h5>Tamaño</h5>
+      <div class="seg">
+        <button>Pequeño<small>12 oz</small></button>
+        <button class="on">Mediano<small>16 oz</small></button>
+        <button>Grande<small>20 oz</small></button>
+      </div>
+    </div>
+    <div class="opt">
+      <h5>Leche</h5>
+      <div class="chips">
+        <button class="on">Sin leche</button><button>Entera</button><button>Almendras</button><button>Avena</button>
+      </div>
+    </div>
+  </div>
+  <div class="buy"><button><span>Agregar</span><span class="num">$31.000</span></button></div>
+</div>
+
+</body>
+</html>
