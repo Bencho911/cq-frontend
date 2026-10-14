@@ -1,54 +1,38 @@
-# Remotion video
+# Promo Café Quindío (Remotion)
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+Video promocional vertical de 30 s (1080×1920, 30 fps) de la app, con las
+capturas reales de las pantallas y los artes corporativos.
 
-Welcome to your Remotion project!
+## Escenas
 
-## Commands
+| Tiempo | Escena | Archivo |
+|---|---|---|
+| 0–3,5 s | Gancho: "El café del Quindío, a un toque." | `S1Hook` |
+| 3,5–8 s | Pide antes de llegar (Inicio, toque en "Pedir por") | `S2Order` |
+| 8–13 s | Como te gusta (detalle con arco, toque en Grande) | `S3Custom` |
+| 13–19 s | Cada 10 puntos, un ave (estampillas + contador) | `S4Album` |
+| 19–24 s | Tu pedido está listo (notificación + premio) | `S5Ready` |
+| 24–27 s | Menú, pedidos y puntos (tres teléfonos) | `S6Montage` |
+| 27–30 s | Cierre con logo, eslogan y llamado a la acción | `S7End` |
 
-**Install Dependencies**
+Las escenas están en `src/scenes.tsx`; la transición de marca (la escena
+nueva sube con el zócalo en el borde) en `src/Promo.tsx`.
 
-```console
-npm i --loglevel=error
+## Comandos
+
+```bash
+npm install
+npm run dev                      # Remotion Studio, para ver y ajustar
+npx remotion render PromoCafeQuindio out/promo-cafe-quindio.mp4 --codec=h264 --crf=18
 ```
 
-**Start Preview**
+En entornos sin Chrome compatible, agrega
+`--browser-executable=<ruta a chrome-headless-shell>`.
 
-```console
-npm run dev
-```
+## Activos
 
-**Render video**
-
-```console
-npx remotion render
-```
-
-**Upgrade Remotion**
-
-```console
-npx remotion upgrade
-```
-
-## Docs
-
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+- `public/screens/`: capturas 3× de la app (`/home`, `/menu`, detalle,
+  carrito, `/album`, pedido listo). Si la app cambia, vuelve a capturarlas.
+- `public/brand/` y `public/fonts/`: los mismos de la app. Neutra Text es
+  comercial: confirmar la licencia antes de publicar el video.
+- El video no tiene audio todavía.
