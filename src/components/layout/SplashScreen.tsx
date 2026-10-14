@@ -19,7 +19,7 @@ const SplashScreen = () => {
         {/* Visible desde el primer cuadro: el splash dura 0.7 s y no debe
             gastar ese tiempo en entradas escalonadas. */}
         <img src="/CQ.svg" alt="Café Quindío" className="h-[54px] w-auto" />
-        <h1 className="font-display text-[17px] font-medium tracking-wide text-ink">
+        <h1 className="font-display text-[17px] font-medium text-ink">
           ¡Permítanos alegrarle el día!
         </h1>
       </div>

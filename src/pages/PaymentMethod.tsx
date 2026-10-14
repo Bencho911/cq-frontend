@@ -1,28 +1,26 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Banknote, CreditCard, Store } from 'lucide-react';
+import { Banknote, CreditCard, Store } from 'lucide-react';
 import { useCart } from '../lib/cart';
+import { PageHeader } from '../components/brand/PageHeader';
 
 const METHODS = [
   {
     id: 'wompi',
     label: 'Tarjeta débito o crédito',
-    description: 'Visa, Mastercard, Amex (procesado por Wompi).',
+    description: 'Visa, Mastercard o Amex. Pago seguro con Wompi.',
     icon: CreditCard,
-    iconBg: 'bg-brand',
   },
   {
     id: 'efectivo',
     label: 'Efectivo en tienda',
-    description: 'Paga al recoger tu pedido.',
+    description: 'Pagas al recoger tu pedido.',
     icon: Banknote,
-    iconBg: 'bg-brand-soft',
   },
   {
     id: 'kiosco',
     label: 'Pago en kiosco',
-    description: 'Usa el terminal de la tienda al recoger.',
+    description: 'Usas el terminal de la tienda al recoger.',
     icon: Store,
-    iconBg: 'bg-brand-strong',
   },
 ];
 
@@ -36,49 +34,41 @@ const PaymentMethod = () => {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-cream">
-      <div className="sticky top-0 z-40 flex items-center gap-1 border-b border-line bg-cream/90 px-2 py-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Volver" className="flex h-10 w-10 items-center justify-center text-ink">
-          <ArrowLeft size={24} aria-hidden />
-        </button>
-        <img
-          src="/Artes corporativos/Logo-Slogan/Logos-Slogan-Café.png"
-          alt="Café Quindío"
-          className="w-28 object-contain"
-        />
-      </div>
+    <div className="flex min-h-[100dvh] flex-col bg-cream pb-8">
+      <PageHeader title="Método de pago" onBack={() => navigate(-1)} />
+      <p className="px-5 text-[15px] text-muted">Elige cómo quieres pagar tu pedido.</p>
 
-      <div className="flex flex-col gap-3 px-5 pt-6">
-        <p className="text-[13px] text-muted">Elige cómo quieres pagar tu pedido.</p>
-
+      <ul className="flex flex-col gap-2.5 px-5 pt-4" role="radiogroup" aria-label="Método de pago">
         {METHODS.map((m) => {
           const active = state.paymentMethod === m.id;
           return (
-            <button
-              key={m.id}
-              onClick={() => select(m.id)}
-              aria-pressed={active}
-              className={`flex items-center gap-4 rounded-3xl border p-4 text-left transition-colors ${
-                active ? 'border-brand bg-brand-soft' : 'border-line bg-surface hover:bg-cream-deep'
-              }`}
-            >
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-cream ${m.iconBg}`}>
-                <m.icon size={24} aria-hidden />
-              </div>
-              <div className="flex flex-1 flex-col gap-0.5">
-                <span className="text-[15px] font-semibold text-ink">{m.label}</span>
-                <span className="text-[13px] text-muted">{m.description}</span>
-              </div>
-              <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${active ? 'border-brand' : 'border-muted-soft'}`}>
-                {active && <div className="h-2.5 w-2.5 rounded-full bg-brand" />}
-              </div>
-            </button>
+            <li key={m.id}>
+              <button
+                onClick={() => select(m.id)}
+                role="radio"
+                aria-checked={active}
+                className={`grid w-full grid-cols-[24px_1fr_22px] items-center gap-3.5 rounded-md border-[1.5px] p-4 text-left transition-[transform,border-color] duration-150 active:scale-[0.97] ${
+                  active ? 'border-ink' : 'border-line'
+                }`}
+              >
+                <m.icon size={24} strokeWidth={1.8} className="text-ink" aria-hidden />
+                <span className="min-w-0">
+                  <span className="block text-[16px] font-bold text-ink">{m.label}</span>
+                  <span className="block text-[14px] leading-snug text-muted">{m.description}</span>
+                </span>
+                <span
+                  className={`grid h-[22px] w-[22px] place-items-center rounded-full border-[1.5px] ${
+                    active ? 'border-ink' : 'border-muted-soft'
+                  }`}
+                  aria-hidden
+                >
+                  {active && <span className="h-3 w-3 rounded-full bg-ink" />}
+                </span>
+              </button>
+            </li>
           );
         })}
-
-        <div className="mt-2">
-        </div>
-      </div>
+      </ul>
     </div>
   );
 };

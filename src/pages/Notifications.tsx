@@ -1,17 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ArrowLeft,
-  Bell,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Coffee,
-  Gift,
-  Info,
-  Star,
-} from 'lucide-react';
+import { Bell, CheckCircle2, Clock, Coffee, Gift, Info, Star } from 'lucide-react';
+import { PageHeader } from '../components/brand/PageHeader';
+import { EmptyState } from '../components/ui/EmptyState';
 
 // MOCK: datos de notificaciones para la demo de gerencia
 const MOCK_NOTIFICATIONS = [
@@ -19,10 +10,8 @@ const MOCK_NOTIFICATIONS = [
     id: 1,
     type: 'order',
     icon: CheckCircle2,
-    iconColor: 'text-success',
-    bgColor: 'bg-success-soft',
-    title: '¡Tu pedido está listo!',
-    body: 'Pedido #1234 — Café con leche y Nitro Cold Brew listos para recoger en Café Quindío · Centro.',
+    title: 'Tu pedido está listo',
+    body: 'Pedido #1234: café con leche y Nitro Cold Brew listos para recoger en la Tienda Centro.',
     time: 'Hace 5 min',
     read: false,
   },
@@ -30,10 +19,8 @@ const MOCK_NOTIFICATIONS = [
     id: 2,
     type: 'promo',
     icon: Gift,
-    iconColor: 'text-accent',
-    bgColor: 'bg-brand-soft',
-    title: 'Descuento especial solo para ti',
-    body: '¡Usa el código CAFE20 y obtén 20% de descuento en tu próximo pedido! Válido hoy.',
+    title: 'Descuento especial para ti',
+    body: 'Usa el código CAFE20 y obtén 20% de descuento en tu próximo pedido. Válido hoy.',
     time: 'Hace 1 h',
     read: false,
   },
@@ -41,10 +28,8 @@ const MOCK_NOTIFICATIONS = [
     id: 3,
     type: 'loyalty',
     icon: Star,
-    iconColor: 'text-star',
-    bgColor: 'bg-warning-soft',
     title: 'Te faltan 3 puntos para un café gratis',
-    body: 'Has acumulado 47 puntos. Llega a 50 y reclama tu bebida favorita sin costo.',
+    body: 'Tienes 47 puntos. Llega a 50 y reclama tu bebida favorita sin costo.',
     time: 'Hace 3 h',
     read: true,
   },
@@ -52,21 +37,17 @@ const MOCK_NOTIFICATIONS = [
     id: 4,
     type: 'order',
     icon: Coffee,
-    iconColor: 'text-brand',
-    bgColor: 'bg-brand-soft',
     title: 'Pedido confirmado',
-    body: 'Tu pedido #1233 fue tomado y está en preparación. Tiempo estimado: 8 minutos.',
-    time: 'Ayer 4:12 PM',
+    body: 'Tu pedido #1233 está en preparación. Tiempo estimado: 8 minutos.',
+    time: 'Ayer, 4:12 p. m.',
     read: true,
   },
   {
     id: 5,
     type: 'info',
     icon: Info,
-    iconColor: 'text-muted',
-    bgColor: 'bg-cream-deep',
     title: 'Nueva tienda en Armenia Norte',
-    body: 'Abrimos una nueva sede en la Cra 19 #22-15. ¡Visítanos y prueba nuestro nuevo menú de temporada!',
+    body: 'Abrimos en la Cra 19 #22-15. Visítanos y prueba el menú de temporada.',
     time: 'Hace 2 días',
     read: true,
   },
@@ -74,10 +55,8 @@ const MOCK_NOTIFICATIONS = [
     id: 6,
     type: 'promo',
     icon: Clock,
-    iconColor: 'text-accent-deep',
-    bgColor: 'bg-accent-soft',
-    title: 'Puntos x2 este fin de semana',
-    body: 'Sábado y domingo duplicamos tus puntos en cada compra. ¡No te lo pierdas!',
+    title: 'Puntos dobles este fin de semana',
+    body: 'Sábado y domingo duplicamos tus puntos en cada compra.',
     time: 'Hace 3 días',
     read: true,
   },
@@ -98,90 +77,69 @@ const Notifications = () => {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-cream">
-      {/* Header */}
-      <div className="sticky top-0 z-[20] flex items-center gap-1 border-b border-line bg-cream/90 px-2 py-3 backdrop-blur-xl">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-cream-deep"
-        >
-          <ArrowLeft size={24} aria-hidden />
-        </button>
-        <div className="flex flex-1 items-center justify-between pr-2">
-          <div className="flex items-center gap-2">
-            <h1 className="font-display text-[20px] font-semibold text-ink">Notificaciones</h1>
-            {unreadCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-cream">
-                {unreadCount}
-              </span>
-            )}
-          </div>
-          {unreadCount > 0 && (
+    <div className="flex min-h-[100dvh] flex-col bg-cream pb-8">
+      <PageHeader
+        title="Notificaciones"
+        onBack={() => navigate(-1)}
+        action={
+          unreadCount > 0 ? (
             <button
               onClick={markAllRead}
-              className="text-[13px] font-semibold text-brand"
+              className="min-h-[44px] max-w-[116px] shrink-0 pr-3 text-right text-[14px] font-semibold leading-tight text-ink underline underline-offset-4"
             >
-              Marcar todas
+              Marcar todas como leídas
             </button>
-          )}
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
 
-      <div className="flex flex-col divide-y divide-line">
-        <AnimatePresence initial={false}>
-          {notifications.map((notif, i) => (
-            <motion.button
-              key={notif.id}
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05, duration: 0.3, ease: "easeOut" as any }}
-              onClick={() => markRead(notif.id)}
-              className={`flex w-full items-start gap-3 px-5 py-4 text-left transition-colors ${
-                notif.read ? 'bg-cream' : 'bg-surface'
-              } hover:bg-cream-deep`}
-            >
-              {/* Indicador de no leído */}
-              <div className="relative mt-1 shrink-0">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${notif.bgColor}`}>
-                  <notif.icon size={20} className={notif.iconColor} aria-hidden />
-                </div>
-                {!notif.read && (
-                  <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-cream" />
-                )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <p className={`text-[14px] leading-snug ${notif.read ? 'font-medium text-muted-strong' : 'font-bold text-ink'}`}>
-                    {notif.title}
-                  </p>
-                  <span className="shrink-0 text-[11px] text-muted-soft">{notif.time}</span>
-                </div>
-                <p className="mt-1 text-[12px] leading-[18px] text-muted">{notif.body}</p>
-              </div>
-
-              <ChevronRight size={16} className="mt-1 shrink-0 text-muted-soft" aria-hidden />
-            </motion.button>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {notifications.length === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-cream-deep">
-            <Bell size={36} className="text-muted-soft" />
-          </div>
-          <h2 className="font-display text-[20px] font-semibold text-ink">Sin notificaciones</h2>
-          <p className="text-[14px] leading-relaxed text-muted">
-            Cuando tengas pedidos, promociones o novedades, aparecerán aquí.
-          </p>
-        </div>
+      {unreadCount > 0 && (
+        <p className="px-5 text-[14px] text-muted">
+          {unreadCount === 1 ? 'Tienes 1 sin leer' : `Tienes ${unreadCount} sin leer`}
+        </p>
       )}
 
-      {/* Footer info badge */}
-      <div className="px-5 py-6 text-center">
-      </div>
+      {notifications.length === 0 ? (
+        <EmptyState
+          icon={Bell}
+          title="Sin notificaciones"
+          description="Cuando tengas pedidos, promociones o novedades, aparecerán aquí."
+        />
+      ) : (
+        <ul className="px-5 pt-1">
+          {notifications.map((notif) => (
+            <li key={notif.id}>
+              <button
+                onClick={() => markRead(notif.id)}
+                className="grid w-full grid-cols-[22px_1fr] gap-3 border-b border-line py-4 text-left"
+              >
+                <notif.icon
+                  size={22}
+                  strokeWidth={1.8}
+                  className={`mt-0.5 ${notif.read ? 'text-muted' : 'text-ink'}`}
+                  aria-hidden
+                />
+                <span className="min-w-0">
+                  <span className="flex items-start gap-2">
+                    <span
+                      className={`min-w-0 flex-1 text-[16px] leading-snug text-ink ${notif.read ? '' : 'font-bold'}`}
+                    >
+                      {notif.title}
+                    </span>
+                    {!notif.read && (
+                      <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-mostaza">
+                        <span className="sr-only">Sin leer</span>
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-1 block text-[15px] leading-snug text-muted">{notif.body}</span>
+                  <span className="mt-1 block text-[13px] text-muted">{notif.time}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
