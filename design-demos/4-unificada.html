@@ -90,7 +90,8 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
 .teaser .in img { height: 60px; filter: grayscale(1) brightness(0); opacity: .18; }
 .teaser b { font-size: 16px; display: block; }
 .teaser small { font-size: 14px; color: var(--tinta-2); }
-.teaser .count { font-size: 22px; }
+.teaser .count { font-size: 24px; text-align: right; line-height: 1; }
+.teaser .count small { display: block; font: 600 13px Neutra; color: var(--tinta-2); letter-spacing: 0; }
 .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: var(--tinta); color: #9FB0B8;
   display: flex; justify-content: space-around; padding-top: 10px; }
 .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; width: 72px; }
@@ -149,6 +150,20 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
 .meter { margin-top: 14px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
 .meter i { height: 8px; border-radius: 2px; background: var(--tinta); } .meter i.off { background: var(--linea); }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; padding: 20px 20px 0; }
+.pts { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.pts > span { font-size: 56px; line-height: .9; }
+.pts b { font-size: 17px; display: block; } .pts small { font-size: 14px; color: var(--tinta-2); }
+.meter5 { margin-top: 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.meter5 i { height: 10px; border-radius: 2px; background: linear-gradient(90deg, var(--tinta) var(--p), var(--linea) var(--p)); }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 4px; font: 600 12px NeutraTF, Neutra; color: var(--tinta-2); text-align: right; }
+.scale span:last-child { white-space: nowrap; color: var(--tinta); }
+.card-t { font: 800 20px Brico; letter-spacing: -0.02em; padding: 22px 20px 0; display: flex; justify-content: space-between; align-items: baseline; }
+.card-t small { font: 400 14px Neutra; letter-spacing: 0; color: var(--tinta-2); }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 10px; padding: 12px 20px 0; }
+.grid3 .stamp { height: 128px; } .grid3 .in img { height: 98px; }
+.grid3 .nm { font-size: 14px; } .grid3 .dt { font-size: 12px; }
+.done { margin: 16px 20px 0; padding: 12px 14px; border: 1.5px solid var(--linea); border-radius: 6px; }
+.done b { font-size: 15px; display: block; } .done small { font-size: 14px; color: var(--tinta-2); }
 .slot .stamp { height: 164px; }
 .slot .in img { height: 128px; }
 .slot .nm { font-size: 15px; font-weight: 700; margin-top: 7px; }
@@ -216,8 +231,8 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
   </div>
   <div class="teaser">
     <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
-    <div><b>Tu próxima ave: Barranquero</b><small>Llega con tu próximo pedido</small></div>
-    <span class="count b">7/10</span>
+    <div><b>Te faltan 3 puntos</b><small>Para el Barranquero y tu bebida gratis</small></div>
+    <span class="count b num-b">47<small>pts</small></span>
   </div>
 </div></div>
 
@@ -265,7 +280,7 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
   </div>
   <div class="prize">
     <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
-    <div><b>Este pedido trae al Barranquero</b><small>Será tu ave 8 de 10. Te faltarían 2 para la bebida gratis.</small></div>
+    <div><b>Este pedido suma <span class="num">12</span> puntos</b><small>Llegas a 59 y completas la tarjeta: ganas al Barranquero y una bebida gratis.</small></div>
   </div>
   <div class="totals"><span>Total</span><span class="num">$56.200</span></div>
   <div class="foot"><button class="primary"><span>Pagar y pedir</span><span class="num">$56.200</span></button></div>
@@ -277,15 +292,21 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
   <div class="status"><span class="num">9:41</span></div>
   <div class="al-head">
     <h1 class="b">Tu álbum</h1>
-    <p>Te faltan 3 aves para tu bebida gratis. La estampilla llega cuando recoges tu pedido.</p>
-    <div class="meter" aria-label="7 de 10 aves"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i></div>
+    <div class="pts"><span class="b">47</span><div><b>puntos</b><small>Te faltan 3 para tu bebida gratis</small></div></div>
+    <div class="meter5" aria-label="47 de 50 puntos: 4 aves de 5">
+      <i style="--p:100%"></i><i style="--p:100%"></i><i style="--p:100%"></i><i style="--p:100%"></i><i style="--p:70%"></i>
+    </div>
+    <div class="scale"><span>10</span><span>20</span><span>30</span><span>40</span><span>50 = bebida</span></div>
   </div>
-  <div class="grid">
-    <div class="slot"><div class="stamp"><div class="in"><img src="img/ave-tucan.png" alt=""></div></div><div class="nm">Tucán</div><div class="dt">3 de octubre, Tienda Centro</div></div>
-    <div class="slot"><div class="stamp" style="--c:var(--teal)"><div class="in"><img src="img/ave-toche.png" alt=""></div></div><div class="nm">Toche</div><div class="dt">29 de septiembre, Tienda Norte</div></div>
-    <div class="slot next"><div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div><div class="nm">Barranquero</div><div class="dt">Llega con tu próximo pedido</div></div>
-    <div class="slot locked"><div class="stamp"><div class="in"><img src="img/ave-carriqui.png" alt=""></div></div><div class="nm">Sin descubrir</div><div class="dt">Estampilla 9 de 10</div></div>
+  <h2 class="card-t">Tarjeta actual <small>Cada 10 puntos, un ave</small></h2>
+  <div class="grid3">
+    <div class="slot"><div class="stamp"><div class="in"><img src="img/ave-tucan.png" alt=""></div></div><div class="nm">Tucán</div></div>
+    <div class="slot"><div class="stamp" style="--c:var(--teal)"><div class="in"><img src="img/ave-toche.png" alt=""></div></div><div class="nm">Toche</div></div>
+    <div class="slot"><div class="stamp" style="--c:var(--rosa-s)"><div class="in"><img src="img/ave-loro.png" alt=""></div></div><div class="nm">Loro</div></div>
+    <div class="slot"><div class="stamp" style="--c:var(--mostaza-s)"><div class="in"><img src="img/ave-martin.png" alt=""></div></div><div class="nm">Martín pescador</div></div>
+    <div class="slot next"><div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div><div class="nm">Barranquero</div><div class="dt">A los 50 puntos</div></div>
   </div>
+  <div class="done"><b>2 tarjetas completas</b><small>2 bebidas canjeadas desde junio</small></div>
 </div></div>
 
 <!-- 5 · LISTO -->
@@ -301,7 +322,7 @@ button:active { transform: scale(0.97); transition: transform 120ms var(--ease-o
   <div class="ground"></div>
   <div class="won">
     <div class="stamp"><div class="in"><img src="img/ave-barranquero.png" alt=""></div></div>
-    <div><b>Al recogerlo ganas al Barranquero</b><small>Ave 8 de 10 en tu álbum</small></div>
+    <div><b>+12 puntos y tarjeta completa</b><small>Ganaste al Barranquero y una bebida gratis</small></div>
   </div>
   <div class="actions">
     <button class="primary" style="justify-content:center">Ya lo recogí</button>
