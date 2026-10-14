@@ -4,7 +4,7 @@ import manifest from '../public/sfx/manifest.json';
 import { TIMING } from './scenes';
 
 /** Efectos del catálogo (scripts/sfx-catalog.json). */
-type SfxId = 'whoosh' | 'tap' | 'pop' | 'stamp' | 'rise' | 'notification' | 'reward' | 'logo';
+type SfxId = 'whoosh' | 'tap' | 'pop' | 'stamp' | 'rise' | 'notification' | 'reward' | 'logo' | 'counter';
 
 interface Cue {
   scene: number;
@@ -25,6 +25,8 @@ const CUES: Cue[] = [
   { scene: 2, at: custom.espresso, id: 'pop', volume: 0.45 },
   // Cada estampilla suena al aterrizar.
   ...[0, 1, 2, 3, 4].map((i) => ({ scene: 3, at: album.firstStamp + i * album.every + album.land, id: 'stamp' as const, volume: 0.75 })),
+  // Los puntos suben de 0 a 50: una ráfaga de golpecitos que acompaña al contador.
+  { scene: 3, at: album.firstStamp, id: 'counter', volume: 0.5 },
   { scene: 3, at: album.firstStamp + album.every * 5 + 6, id: 'reward', volume: 0.6 },
   { scene: 4, at: ready.note, id: 'notification', volume: 0.8 },
   { scene: 4, at: ready.card, id: 'reward', volume: 0.55 },
@@ -38,6 +40,8 @@ const VOICE = [{ file: 'voz.mp3', at: 0 }];
 
 const DUCK = 0.55;
 const VOICE_VOLUME = 0.9;
+/** Ambiente de cafetería (loop de 10 s repetido a 30 s), muy por debajo de la voz. */
+const AMBIENCE_VOLUME = 0.55;
 
 /**
  * Pista de efectos. Solo programa los sonidos listados en manifest.json,
@@ -60,6 +64,7 @@ export const SoundTrack: React.FC<{ sceneStarts: number[] }> = ({ sceneStarts })
 
 export const VoiceTrack: React.FC = () => (
   <>
+    <Audio src={staticFile('sfx/ambiente.wav')} volume={AMBIENCE_VOLUME} />
     {VOICE.map((v) => (
       <Sequence key={v.file} from={v.at} layout="none">
         <Audio src={staticFile(`vo/${v.file}`)} volume={VOICE_VOLUME} />

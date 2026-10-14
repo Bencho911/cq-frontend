@@ -7,6 +7,7 @@
     "rise": "rise.wav",
     "notification": "notification.wav",
     "reward": "reward.wav",
-    "logo": "logo.wav"
+    "logo": "logo.wav",
+    "counter": "counter.wav"
   }
 }

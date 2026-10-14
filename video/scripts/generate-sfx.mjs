@@ -37,9 +37,9 @@ if (unknown.length > 0) {
 
 const client = new ElevenLabsClient();
 for (const id of ids) {
-  const { text, durationSeconds, promptInfluence } = catalog[id];
+  const { text, durationSeconds, promptInfluence, loop } = catalog[id];
   process.stdout.write(`Generando ${id}… `);
-  const audio = await client.textToSoundEffects.convert({ text, durationSeconds, promptInfluence, outputFormat: 'mp3_44100_128' });
+  const audio = await client.textToSoundEffects.convert({ text, durationSeconds, promptInfluence, loop, outputFormat: 'mp3_44100_128' });
   await finished(Readable.fromWeb(audio).pipe(createWriteStream(join(outDir, `${id}.mp3`))));
   console.log('listo');
 }
