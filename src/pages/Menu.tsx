@@ -12,6 +12,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import ProductDetailSheet from '../components/ui/ProductDetailSheet';
+import { Bump } from '../components/ui/Bump';
 
 const ALL = 'Todos';
 
@@ -79,9 +80,12 @@ const Menu = () => {
           >
             <ShoppingBag size={20} aria-hidden />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-mostaza px-1 text-[12px] font-bold text-ink">
+              <Bump
+                value={count}
+                className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-mostaza px-1 text-[12px] font-bold text-ink"
+              >
                 {count}
-              </span>
+              </Bump>
             )}
           </button>
         </div>
@@ -149,7 +153,7 @@ const Menu = () => {
           >
             <span className="flex items-center gap-2.5 text-[16px] font-bold">
               <ShoppingBag size={20} aria-hidden />
-              Ver pedido (<span className="num">{count}</span>)
+              Ver pedido (<Bump value={count} className="num">{count}</Bump>)
             </span>
             <span className="num text-[16px] font-semibold">{formatCOP(subtotal)}</span>
           </motion.button>
