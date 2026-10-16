@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Store as StoreIcon } from 'lucide-react';
 import { orderService } from '../lib/orderService';
 import { useCartTotals } from '../lib/cart';
@@ -29,6 +30,7 @@ const TrackOrder = () => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderLines, setOrderLines] = useState<OrderLine[]>([]);
   const store = useSelectedStore();
+  const reduced = useReducedMotion() ?? false;
 
   useEffect(() => {
     if (!orderId) return;
@@ -95,10 +97,18 @@ const TrackOrder = () => {
               Pedido <span className="num text-ink">{orderId}</span>
             </span>
           )}
-          <h2 className="mt-1 font-display text-[40px] font-extrabold leading-[0.95] tracking-[-0.04em] text-ink">
-            {current.title}
-          </h2>
-          <p className="mt-2 text-[16px] text-muted">{current.desc}</p>
+          {/* El estado nuevo entra con un fundido corto; el anterior sale sin esperar */}
+          <motion.div
+            key={step}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <h2 className="mt-1 min-h-[2lh] font-display text-[40px] font-extrabold leading-[0.95] tracking-[-0.04em] text-ink">
+              {current.title}
+            </h2>
+            <p className="mt-2 text-[16px] text-muted">{current.desc}</p>
+          </motion.div>
 
           {/* Un tramo por paso */}
           <div
@@ -111,15 +121,19 @@ const TrackOrder = () => {
             aria-label="Avance del pedido"
           >
             {STEPS.map((s, i) => (
-              <span
-                key={s.label}
-                className={`h-2.5 rounded-sm transition-colors duration-500 ${i < step ? 'bg-ink' : 'bg-line'}`}
-              />
+              // El tramo nuevo se llena de izquierda a derecha.
+              <span key={s.label} className="relative h-2.5 overflow-hidden rounded-sm bg-line">
+                <span
+                  className={`absolute inset-0 origin-left bg-ink transition-transform duration-[400ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${
+                    i < step ? 'scale-x-100' : 'scale-x-0'
+                  }`}
+                />
+              </span>
             ))}
           </div>
           <div className="mt-1.5 grid grid-cols-3 gap-1 text-[13px]" aria-hidden>
             {STEPS.map((s, i) => (
-              <span key={s.label} className={i < step ? 'font-semibold text-ink' : 'text-muted'}>
+              <span key={s.label} className={`transition-colors duration-300 ${i < step ? 'font-semibold text-ink' : 'text-muted'}`}>
                 {s.label}
               </span>
             ))}
