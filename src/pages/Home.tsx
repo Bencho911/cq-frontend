@@ -24,6 +24,7 @@ import { ErrorState } from '../components/ui/ErrorState';
 import ProductDetailSheet from '../components/ui/ProductDetailSheet';
 import { Door, type DoorTone } from '../components/brand/Door';
 import { Stamp } from '../components/brand/Stamp';
+import { Bump } from '../components/ui/Bump';
 
 /** Cada categoría es una puerta pintada; el orden de tonos se repite. */
 const DOOR_STYLES: { tone: DoorTone; image: string }[] = [
@@ -247,7 +248,7 @@ const Home = () => {
           >
             <span className="flex items-center gap-2.5 text-[16px] font-bold">
               <ShoppingBag size={20} aria-hidden />
-              Ver pedido (<span className="num">{count}</span>)
+              Ver pedido (<Bump value={count} className="num">{count}</Bump>)
             </span>
             <span className="num text-[16px] font-semibold">{formatCOP(subtotal)}</span>
           </motion.button>

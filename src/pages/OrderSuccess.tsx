@@ -1,14 +1,45 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const COUNTDOWN = 3;
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+/** Puntos que sumó el pedido: la píldora entra y el número sube desde 0. */
+function EarnedPoints({ earned, reduced }: { earned: number; reduced: boolean }) {
+  const value = useMotionValue(reduced ? earned : 0);
+  const shown = useTransform(value, (v) => `+${Math.round(v)}`);
+
+  useEffect(() => {
+    if (reduced) return;
+    const controls = animate(value, earned, { duration: 0.6, ease: EASE_OUT, delay: 0.45 });
+    return () => controls.stop();
+  }, [earned, reduced, value]);
+
+  return (
+    <motion.p
+      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: EASE_OUT, delay: reduced ? 0 : 0.45 }}
+      className="mt-5 inline-flex h-10 items-center gap-1.5 rounded-full bg-mostaza px-4 text-[16px] font-bold text-ink"
+    >
+      <motion.span className="num" aria-hidden>
+        {shown}
+      </motion.span>
+      <span className="sr-only">{`+${earned}`}</span>
+      puntos para tu álbum
+    </motion.p>
+  );
+}
 
 /** Confirmación breve antes del seguimiento: verde de fachada, sin halos. */
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const orderId = (location.state as { orderId?: number } | null)?.orderId ?? null;
+  const routeState = location.state as { orderId?: number; earned?: number } | null;
+  const orderId = routeState?.orderId ?? null;
+  const earned = routeState?.earned ?? 0;
+  const reduced = useReducedMotion() ?? false;
   const [count, setCount] = useState(COUNTDOWN);
 
   useEffect(() => {
@@ -32,7 +63,7 @@ const OrderSuccess = () => {
         <motion.h1
           initial={{ opacity: 0, transform: 'translateY(12px)' }}
           animate={{ opacity: 1, transform: 'translateY(0px)' }}
-          transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.45, ease: EASE_OUT }}
           className="mt-4 font-display text-[54px] font-extrabold leading-[0.92] tracking-[-0.045em]"
         >
           Recibimos tu pedido.
@@ -40,16 +71,27 @@ const OrderSuccess = () => {
         <p className="mt-3 text-[17px] leading-snug text-[#D7ECE9]">
           La barra ya lo está preparando. Te avisamos cuando esté listo.
         </p>
+        {earned > 0 && <EarnedPoints earned={earned} reduced={reduced} />}
       </div>
 
-      <img
+      {/* La fachada se arma: el zócalo se dibuja y la ventana con el ave sube a su lugar */}
+      <motion.img
         src="/brand/ventana-ave.webp"
         alt=""
         aria-hidden
         className="pointer-events-none absolute bottom-[150px] left-1/2 w-[230px] -translate-x-1/2"
+        initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE_OUT, delay: reduced ? 0 : 0.15 }}
       />
       <div className="absolute inset-x-0 bottom-0 h-[150px] bg-mostaza">
-        <div className="zocalo absolute inset-x-0 top-0 -translate-y-full" aria-hidden />
+        <motion.div
+          className="zocalo absolute inset-x-0 top-0 origin-left -translate-y-full"
+          initial={{ scaleX: reduced ? 1 : 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.05 }}
+          aria-hidden
+        />
       </div>
 
       <div className="absolute inset-x-5 bottom-[calc(env(safe-area-inset-bottom)+24px)] grid gap-1">

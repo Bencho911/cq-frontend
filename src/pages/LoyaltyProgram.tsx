@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from 'framer-motion';
 import {
   BIRDS_PER_CARD,
   MOCK_ACCOUNT,
@@ -6,6 +8,7 @@ import {
   summarize,
 } from '../lib/loyalty';
 import { Stamp } from '../components/brand/Stamp';
+import { pointsFrom, readSeen, writeSeen } from '../lib/loyaltySeen';
 
 // MOCK: beneficios e historial (el backend aún no expone el programa).
 const BENEFITS = [
@@ -20,13 +23,88 @@ const HISTORY = [
   { id: 3, action: 'Compra en Tienda Norte', points: 15, date: '28 ago, 4:30 p. m.' },
 ];
 
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+/** Sello de las aves nuevas; se crea al primer uso. */
+let stampSound: HTMLAudioElement | null = null;
+function playStamp() {
+  try {
+    stampSound ??= new Audio('/sfx/stamp.wav');
+    const s = stampSound.cloneNode() as HTMLAudioElement;
+    s.volume = 0.5;
+    void s.play().catch(() => {});
+  } catch {
+    /* sin audio */
+  }
+}
+
+/** Un tramo de la barra: se llena con el mismo valor que mueve el contador. */
+function Segment({ progress, index }: { progress: MotionValue<number>; index: number }) {
+  const scaleX = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - index * POINTS_PER_BIRD) / POINTS_PER_BIRD)));
+  return (
+    <span className="relative h-2.5 overflow-hidden rounded-sm bg-line">
+      <motion.span className="absolute inset-0 origin-left bg-ink" style={{ scaleX }} />
+    </span>
+  );
+}
+
+/** El ave nueva cae sobre su silueta como un sello: algo grande y ladeada, con un rebote corto. */
+function SealedStamp({ children, reduced }: { children: React.ReactNode; reduced: boolean }) {
+  return (
+    <motion.div
+      className="absolute inset-0"
+      initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.18, rotate: -8 }}
+      animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, rotate: 0 }}
+      transition={
+        reduced
+          ? { duration: 0.2 }
+          : { type: 'spring', duration: 0.45, bounce: 0.25, opacity: { duration: 0.12 } }
+      }
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 /**
  * Lealtad: los puntos son el sistema oficial y el álbum los ilustra.
  * Cada 10 puntos se gana un ave; 5 aves (50 puntos) = bebida gratis.
  */
 const LoyaltyProgram = () => {
   const s = summarize(MOCK_ACCOUNT);
-  const nextIndex = s.slots.findIndex((slot) => !slot.earned);
+  const reduced = useReducedMotion() ?? false;
+
+  // Los puntos suben desde lo que se vio la última vez y cada ave nueva se
+  // sella justo cuando el contador cruza su decena.
+  const [from] = useState(() => (reduced ? s.points : pointsFrom(readSeen(), MOCK_ACCOUNT)));
+  const progress = useMotionValue(from);
+  const shown = useTransform(progress, (v) => Math.round(v));
+  const birdsAtStart = Math.floor(from / POINTS_PER_BIRD);
+  const [birdsShown, setBirdsShown] = useState(birdsAtStart);
+  const lastBirds = useRef(birdsAtStart);
+
+  useMotionValueEvent(progress, 'change', (v) => {
+    const birds = Math.min(s.birdsEarned, Math.floor(v / POINTS_PER_BIRD));
+    if (birds > lastBirds.current) {
+      lastBirds.current = birds;
+      setBirdsShown(birds);
+      playStamp();
+    }
+  });
+
+  useEffect(() => {
+    writeSeen(MOCK_ACCOUNT);
+    const delta = s.points - from;
+    if (delta <= 0) return;
+    const controls = animate(progress, s.points, {
+      duration: Math.min(1.1, 0.6 + delta * 0.012),
+      ease: EASE_OUT,
+      delay: 0.25,
+    });
+    return () => controls.stop();
+  }, [from, progress, s.points]);
+
+  const nextIndex = birdsShown < BIRDS_PER_CARD ? birdsShown : -1;
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-cream pb-28">
@@ -34,7 +112,10 @@ const LoyaltyProgram = () => {
         <h1 className="font-display text-[34px] font-extrabold leading-none text-ink">Tu álbum</h1>
 
         <div className="mt-4 flex items-center gap-3">
-          <span className="font-display text-[56px] font-extrabold leading-[0.9] text-ink">{s.points}</span>
+          <span className="font-display text-[56px] font-extrabold leading-[0.9] text-ink">
+            <motion.span aria-hidden>{shown}</motion.span>
+            <span className="sr-only">{s.points}</span>
+          </span>
           <span>
             <span className="block text-[17px] font-bold text-ink">puntos</span>
             <span className="block text-[14px] text-muted">
@@ -54,16 +135,9 @@ const LoyaltyProgram = () => {
           aria-valuenow={s.points}
           aria-label={`${s.points} de ${POINTS_PER_REWARD} puntos`}
         >
-          {s.slots.map((slot, i) => {
-            const fill = slot.earned ? 100 : i === nextIndex ? s.progressToNextBird * 100 : 0;
-            return (
-              <span
-                key={slot.at}
-                className="h-2.5 rounded-sm"
-                style={{ background: `linear-gradient(90deg, var(--color-ink) ${fill}%, var(--color-line) ${fill}%)` }}
-              />
-            );
-          })}
+          {s.slots.map((slot, i) => (
+            <Segment key={slot.at} progress={progress} index={i} />
+          ))}
         </div>
         <div className="num mt-1 grid grid-cols-5 gap-1 text-right text-[12px] text-muted" aria-hidden>
           {s.slots.map((slot, i) => (
@@ -81,14 +155,25 @@ const LoyaltyProgram = () => {
         </div>
         <ul className="mt-3 grid grid-cols-3 gap-x-2.5 gap-y-3">
           {s.slots.map((slot, i) => {
-            const state = slot.earned ? 'earned' : i === nextIndex ? 'next' : 'locked';
+            const earned = i < birdsShown;
+            const state = earned ? 'earned' : i === nextIndex ? 'next' : 'locked';
+            const sealing = earned && i >= birdsAtStart;
             return (
               <li key={slot.at}>
-                <Stamp bird={slot.bird} state={state} className="h-[128px]" />
+                {sealing ? (
+                  <div className="relative h-[128px]">
+                    <Stamp bird={slot.bird} state="next" className="h-full" />
+                    <SealedStamp reduced={reduced}>
+                      <Stamp bird={slot.bird} state="earned" className="h-full" />
+                    </SealedStamp>
+                  </div>
+                ) : (
+                  <Stamp bird={slot.bird} state={state} className="h-[128px]" />
+                )}
                 <span className="mt-1.5 block text-[14px] font-bold text-ink">
                   {state === 'locked' ? 'Por descubrir' : slot.bird.name}
                 </span>
-                {!slot.earned && <span className="block text-[12px] text-muted">A los {slot.at} puntos</span>}
+                {!earned && <span className="block text-[12px] text-muted">A los {slot.at} puntos</span>}
               </li>
             );
           })}

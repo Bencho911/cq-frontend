@@ -54,7 +54,7 @@ const Checkout = () => {
       }
 
       dispatch({ type: 'CLEAR' });
-      navigate('/order-success', { state: { orderId: order.id_vent } });
+      navigate('/order-success', { state: { orderId: order.id_vent, earned } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'No se pudo crear el pedido');
     } finally {

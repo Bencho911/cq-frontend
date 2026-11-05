@@ -1,0 +1,48 @@
+{
+  "_comment": "Descripción de cada efecto para ElevenLabs Text to Sound Effects (las mismas usadas en el flow «Promo Café Quindío · efectos de sonido»). Los .wav de public/sfx son la variación elegida, recortada y nivelada a -3 dBFS.",
+  "whoosh": {
+    "text": "Short soft airy whoosh, quick upward swipe, smooth and clean, no tail",
+    "durationSeconds": 0.7,
+    "promptInfluence": 0.6
+  },
+  "tap": {
+    "text": "Single soft tap on a phone glass screen, muted crisp click, close-mic, dry",
+    "durationSeconds": 0.5,
+    "promptInfluence": 0.7
+  },
+  "pop": {
+    "text": "Small light bubbly pop, soft and short, friendly UI blip",
+    "durationSeconds": 0.5,
+    "promptInfluence": 0.6
+  },
+  "stamp": {
+    "text": "Rubber stamp pressed firmly on paper, short woody thud, dry close-mic",
+    "durationSeconds": 0.6,
+    "promptInfluence": 0.65
+  },
+  "rise": {
+    "text": "Gentle rustle of tropical leaves rising, soft paper slide, warm and short",
+    "durationSeconds": 1.2,
+    "promptInfluence": 0.5
+  },
+  "notification": {
+    "text": "Warm two-note marimba notification chime, bright and short",
+    "durationSeconds": 1.0,
+    "promptInfluence": 0.65
+  },
+  "reward": {
+    "text": "Cheerful short marimba arpeggio rising, small sparkle, celebratory and light",
+    "durationSeconds": 1.2,
+    "promptInfluence": 0.6
+  },
+  "logo": {
+    "text": "Warm acoustic guitar strum with soft marimba resolve, gentle and short",
+    "durationSeconds": 2.5,
+    "promptInfluence": 0.5
+  },
+  "counter": {
+    "text": "Points counter counting up in a mobile game: fast series of soft bright wooden marimba ticks rising in pitch, starting quick and slowing slightly at the end, light and cheerful, clean UI sound, dry, no reverb tail",
+    "durationSeconds": 1.0,
+    "promptInfluence": 0.3
+  }
+}

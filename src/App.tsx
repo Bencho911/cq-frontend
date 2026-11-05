@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import Layout from './components/layout/Layout';
-import SplashScreen from './components/layout/SplashScreen';
+import SplashScreen, { SPLASH_MS } from './components/layout/SplashScreen';
 
 // Auth / Onboarding
 import Onboarding from './pages/Onboarding';
@@ -62,7 +62,8 @@ function App() {
 
   useEffect(() => {
     // Antes: splash + transición líquida = 4 s antes de poder usar la app.
-    const t = setTimeout(() => setShowSplash(false), 700);
+    // Ahora la fachada se abre en ~1 s y la app ya está montada debajo.
+    const t = setTimeout(() => setShowSplash(false), SPLASH_MS);
     return () => clearTimeout(t);
   }, []);
 
